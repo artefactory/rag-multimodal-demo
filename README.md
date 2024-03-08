@@ -1,7 +1,7 @@
 # RAG Multimodal Demo <!-- omit from toc -->
 
 - [Features](#features)
-  - [RAG 3](#rag-3)
+  - [RAG Option 3](#rag-option-3)
 - [Installation](#installation)
 - [Usage](#usage)
 - [Development](#development)
@@ -14,7 +14,11 @@ This project demonstrates a multimodal system capable of processing and summariz
 - Summarization of images, tables, and text documents.
 - Extraction and storage of metadata for various data types.
 
-### RAG 3
+![alt text](https://blog.langchain.dev/content/images/size/w1600/2023/10/image-22.png)
+
+### RAG Option 3
+
+Folder : [backend/rag_3](backend/rag_3)
 
 - Use [Unstructured](https://unstructured.io/) to parse images, text, and tables from documents (PDFs).
 - Use the [multi-vector retriever](https://python.langchain.com/docs/modules/data_connection/retrievers/multi_vector) with [Chroma](https://www.trychroma.com/) to store raw text and images along with their summaries for retrieval.
