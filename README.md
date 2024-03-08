@@ -32,6 +32,13 @@ To set up the project, ensure you have Python version between 3.10 and 3.11. The
 poetry install
 ```
 
+Before running the application, you need to set up the environment variables. Copy the `template.env` file to a new file named `.env` and fill in the necessary API keys and endpoints:
+
+```bash
+cp template.env .env
+# Edit the .env file with your actual values
+```
+
 ## Usage
 
 To use the RAG Multimodal Demo, follow these steps:
