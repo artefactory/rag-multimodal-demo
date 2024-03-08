@@ -164,7 +164,7 @@ async def ingest_pdf(filename, config):
 
 @hydra.main(config_path=".", config_name="config", version_base=None)
 def main(config):
-    docs_folder = Path(config.path.docs_folder)
+    docs_folder = Path(config.path.docs)
 
     for file_path in tqdm(sorted(docs_folder.glob("**/*.pdf"))):
         loop = asyncio.get_event_loop()
