@@ -1,0 +1,65 @@
+name: rag_3
+
+path:
+  docs: "docs/"
+  database: "database/${..name}/"
+
+text_llm:
+  _target_: langchain_openai.AzureChatOpenAI
+  azure_endpoint: ${oc.env:TEXT_OPENAI_ENDPOINT}
+  openai_api_key: ${oc.env:TEXT_OPENAI_API_KEY}
+  openai_api_version: "2024-02-15-preview"
+  deployment_name: "gpt4"
+  temperature: 0.0
+  max_tokens: 1024
+
+vision_llm:
+  _target_: langchain_openai.AzureChatOpenAI
+  azure_endpoint: ${oc.env:VISION_OPENAI_ENDPOINT}
+  openai_api_key: ${oc.env:VISION_OPENAI_API_KEY}
+  openai_api_version: "2024-02-15-preview"
+  deployment_name: "gpt-4-vision"
+  temperature: 0.0
+  max_tokens: 1024
+
+embedding:
+  _target_: langchain_openai.AzureOpenAIEmbeddings
+  azure_endpoint: ${oc.env:EMBEDDING_OPENAI_ENDPOINT}
+  openai_api_key: ${oc.env:EMBEDDING_OPENAI_API_KEY}
+  deployment: "ada"
+  chunk_size: 500
+
+vectorstore:
+  _target_: langchain_community.vectorstores.Chroma
+  collection_name: "summaries"
+  embedding_function: ${..embedding}
+
+store:
+  _target_: langchain.storage.LocalFileStore
+  root_path: "${..path.database}/multi_vector_retriever_metadata/"
+
+retriever:
+  _target_: langchain.retrievers.multi_vector.MultiVectorRetriever
+  vectorstore: ${..vectorstore}
+  byte_store: ${..store}
+  id_key: "doc_id"
+
+ingest:
+  chunking:
+    enable: True
+    func:
+      _target_: unstructured.chunking.title.chunk_by_title
+      _partial_: True
+      max_characters: 4000
+      new_after_n_chars: 3800
+      combine_text_under_n_chars: 2000
+
+  summarize_text: False
+  table_format: "html" # "text" or "html" or "image"
+
+  metadata_keys:
+    - filename
+    - page_number
+
+database:
+  url: sqlite:///database/${..version}/rag.sqlite3
