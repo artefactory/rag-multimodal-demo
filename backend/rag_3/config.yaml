@@ -33,6 +33,7 @@ vectorstore:
   _target_: langchain_community.vectorstores.Chroma
   collection_name: "summaries"
   embedding_function: ${..embedding}
+  persist_directory: "${..path.database}/chroma_db/"
 
 store:
   _target_: langchain.storage.LocalFileStore
