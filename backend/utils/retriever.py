@@ -2,6 +2,7 @@ import uuid
 from typing import Optional
 
 from hydra.utils import instantiate
+from langchain.retrievers.multi_vector import MultiVectorRetriever
 from langchain_core.documents import Document
 from langchain_core.retrievers import BaseRetriever
 
@@ -11,8 +12,8 @@ def get_retriever(config) -> BaseRetriever:
 
 
 # Helper function to add documents to the vectorstore and docstore
-def add_documents(
-    retriever,
+def add_documents_multivector(
+    retriever: MultiVectorRetriever,
     doc_summaries: list[str],
     doc_contents: Optional[list[Document]] = None,
     doc_contents_str: Optional[list[str]] = None,
@@ -26,6 +27,9 @@ def add_documents(
         raise ValueError(
             "Only one of doc_contents or doc_contents_str must be provided"
         )
+
+    if not isinstance(retriever, MultiVectorRetriever):
+        raise ValueError("retriever must be a MultiVectorRetriever")
 
     doc_ids = [str(uuid.uuid4()) for _ in doc_summaries]
 

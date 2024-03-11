@@ -9,7 +9,7 @@ from unstructured.partition.pdf import partition_pdf
 
 from backend.utils.elements import Image, Table, Text
 from backend.utils.llm import get_text_llm, get_vision_llm
-from backend.utils.retriever import add_documents, get_retriever
+from backend.utils.retriever import add_documents_multivector, get_retriever
 from backend.utils.summarization import (
     generate_image_summaries,
     generate_text_summaries,
@@ -132,7 +132,7 @@ async def ingest_pdf(file_path, config):
     text_contents = [text.get_content() for text in texts]
     text_metadata = [text.get_metadata() for text in texts]
 
-    add_documents(
+    add_documents_multivector(
         retriever=retriever,
         doc_summaries=text_summaries,
         doc_contents_str=text_contents,
@@ -144,7 +144,7 @@ async def ingest_pdf(file_path, config):
     table_contents = [table.get_content() for table in tables]
     table_metadata = [table.get_metadata() for table in tables]
 
-    add_documents(
+    add_documents_multivector(
         retriever=retriever,
         doc_summaries=table_summaries,
         doc_contents_str=table_contents,
@@ -156,7 +156,7 @@ async def ingest_pdf(file_path, config):
     image_contents = [image.get_content() for image in images]
     image_metadata = [image.get_metadata() for image in images]
 
-    add_documents(
+    add_documents_multivector(
         retriever=retriever,
         doc_summaries=image_summaries,
         doc_contents_str=image_contents,
