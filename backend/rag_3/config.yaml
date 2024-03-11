@@ -1,8 +1,9 @@
 name: rag_3
 
 path:
-  docs: "docs/"
-  database: "database/${..name}/"
+  docs: "docs"
+  export_extracted: "${.docs}/extracted/${..name}"
+  database: "database/${..name}"
 
 text_llm:
   _target_: langchain_openai.AzureChatOpenAI
@@ -33,7 +34,7 @@ vectorstore:
   _target_: langchain_community.vectorstores.Chroma
   collection_name: "summaries"
   embedding_function: ${..embedding}
-  persist_directory: "${..path.database}/chroma_db/"
+  persist_directory: "${..path.database}/chroma_db"
 
 store:
   _target_: langchain.storage.LocalFileStore
@@ -56,6 +57,8 @@ ingest:
 
   summarize_text: False
   table_format: "html" # "text" or "html" or "image"
+
+  export_extracted: True
 
   metadata_keys:
     - filename

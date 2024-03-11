@@ -1,4 +1,5 @@
 import asyncio
+import shutil
 from pathlib import Path
 
 import hydra
@@ -90,10 +91,10 @@ async def apply_summarize_image(image_list: list[Image], config) -> None:
     return
 
 
-async def ingest_pdf(filename, config):
+async def ingest_pdf(file_path, config):
     # Get elements
     raw_pdf_elements = partition_pdf(
-        filename=filename,
+        filename=file_path,
         infer_table_structure=True,
         extract_image_block_types=["image", "table"],
         extract_image_block_to_payload=True,
@@ -161,6 +162,21 @@ async def ingest_pdf(filename, config):
         doc_contents_str=image_contents,
         doc_metadata=image_metadata,
     )
+
+    # Export extracted elements
+    if config.ingest.export_extracted:
+        output_folder = Path(config.path.export_extracted) / Path(file_path).stem
+        shutil.rmtree(output_folder, ignore_errors=True)
+        output_folder.mkdir(parents=True, exist_ok=True)
+
+        for idx, elem in enumerate(texts):
+            elem.export(output_folder / "text", f"{idx:02d}")
+
+        for idx, elem in enumerate(tables):
+            elem.export(output_folder / "table", f"{idx:02d}")
+
+        for idx, elem in enumerate(images):
+            elem.export(output_folder / "image", f"{idx:02d}")
 
     return
 

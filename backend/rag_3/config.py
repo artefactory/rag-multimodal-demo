@@ -17,6 +17,7 @@ class HydraObject(BaseModel):
 class PathConfig:
     docs: str
     database: str
+    export_extracted: str
 
 
 @dataclass(config=ConfigDict(extra="forbid"))
@@ -28,6 +29,8 @@ class IngestConfig:
     table_format: Literal["text", "html", "image"]
 
     metadata_keys: list[str]
+
+    export_extracted: bool
 
 
 @dataclass(config=ConfigDict(extra="forbid"))

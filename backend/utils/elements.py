@@ -1,6 +1,8 @@
+import base64
+from pathlib import Path
 from typing import Any, Dict, Literal, Optional
 
-from IPython.display import HTML, display
+from IPython.display import HTML, Markdown, display
 from pydantic import BaseModel, PrivateAttr
 
 
@@ -41,21 +43,67 @@ class Element(BaseModel):
             print(f"  {key}: {value}")
 
     def _ipython_display_(self):
+        class_name = self.__class__.__name__
+        display(HTML(f'<b style="color: red;">{class_name}</b>'))
+
         self._display_content()
         self._display_summary()
         self._display_metadata()
+
+    def export(self, folder_path: Path | str, filename: str):
+        Path(folder_path).mkdir(parents=True, exist_ok=True)
+
+        self._export_content(folder_path, filename)
+        self._export_summary(folder_path, filename)
+
+    def _export_content(self, folder_path: Path | str, filename: str):
+        raise NotImplementedError
+
+    def _export_summary(self, folder_path: Path | str, filename: str):
+        if self._summary is not None:
+            file_path = Path(folder_path) / f"{filename}.summary"
+            file_path.write_text(self._summary)
 
 
 class Text(Element):
     type: Literal["text"] = "text"
     text: str
+    format: Literal["text", "html", "markdown"] = "text"
 
     def get_content(self):
         return self.text
 
+    def get_metadata(self):
+        return {
+            "type": self.type,
+            "format": self.format,
+            **self.metadata,
+        }
+
     def _display_content(self):
-        display(HTML('<b style="color: red;">Text</b>'))
-        print(self.text)
+        match self.format:
+            case "text":
+                print(self.text)
+            case "html":
+                display(HTML(self.text))
+            case "markdown":
+                display(Markdown(self.text))
+            case other:
+                raise ValueError(f"Unsupported format: {other}")
+
+    def _export_content(self, folder_path: Path | str, filename: str):
+        match self.format:
+            case "text":
+                extension = "txt"
+            case "html":
+                extension = "html"
+            case "markdown":
+                extension = "md"
+            case other:
+                raise ValueError(f"Unsupported format: {other}")
+
+        file_path = Path(folder_path) / f"{filename}.{extension}"
+        file_path.write_text(self.text)
 
 
 class Image(Element):
@@ -74,13 +122,18 @@ class Image(Element):
         }
 
     def _display_content(self):
-        display(HTML('<b style="color: red;">Image</b>'))
         display(HTML(f'<img src="data:{self.mime_type};base64,{self.base64}">'))
+
+    def _export_content(self, folder_path: Path | str, filename: str):
+        extension = self.mime_type.split("/")[1]
+        file_path = Path(folder_path) / f"{filename}.{extension}"
+        with file_path.open("wb") as file:
+            file.write(base64.b64decode(self.base64))
 
 
 class Table(Element):
     type: Literal["table"] = "table"
-    format: Literal["text", "html", "image"]
+    format: Literal["text", "html", "markdown", "image"]
 
     def get_metadata(self):
         return {
@@ -91,15 +144,7 @@ class Table(Element):
 
 
 class TableText(Table, Text):
-    format: Literal["text", "html"]
-
-    def _display_content(self):
-        display(HTML('<b style="color: red;">Table</b>'))
-        if self.format == "html":
-            display(HTML(self.text))
-
-        if self.format == "text":
-            print(self.text)
+    format: Literal["text", "html", "markdown"]
 
 
 class TableImage(Table, Image):
@@ -122,7 +167,7 @@ def langchain_doc_to_element(docs: list):
             case "table":
                 table_format = doc.metadata["format"]
                 match table_format:
-                    case "text" | "html":
+                    case "text" | "html" | "markdown":
                         element = TableText(
                             text=doc.page_content,
                             format=table_format,
@@ -135,10 +180,10 @@ def langchain_doc_to_element(docs: list):
                             mime_type=doc.metadata["mime_type"],
                             metadata=doc.metadata,
                         )
-                    case _:
-                        raise ValueError(f"Unsupported table format: {table_format}")
-            case _:
-                raise ValueError(f"Unsupported document type: {doc.metadata['type']}")
+                    case other:
+                        raise ValueError(f"Unsupported table format: {other}")
+            case other:
+                raise ValueError(f"Unsupported document type: {other['type']}")
         elements.append(element)
 
     return elements
