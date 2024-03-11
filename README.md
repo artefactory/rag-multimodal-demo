@@ -1,6 +1,7 @@
 # RAG Multimodal Demo <!-- omit from toc -->
 
 - [Features](#features)
+  - [RAG Option 1](#rag-option-1)
   - [RAG Option 3](#rag-option-3)
 - [Installation](#installation)
 - [Usage](#usage)
@@ -11,16 +12,37 @@ This project demonstrates a multimodal system capable of processing and summariz
 
 ## Features
 
+- Use [Unstructured](https://unstructured.io/) to parse images, text, and tables from documents (PDFs).
 - Summarization of images, tables, and text documents.
 - Extraction and storage of metadata for various data types.
 
 ![alt text](https://blog.langchain.dev/content/images/size/w1600/2023/10/image-22.png)
 
+### RAG Option 1
+
+Folder: [backend/rag_1](backend/rag_1)
+
+Method:
+- Use multimodal embeddings (such as CLIP) to embed images and text.
+- Retrieve both images and text using similarity search.
+- Pass raw images and text chunks to a multimodal LLM for answer synthesis
+
+Backend:
+- Use [Open Clip](https://github.com/mlfoundations/open_clip) multi-modal embeddings.
+- Use [Chroma](https://www.trychroma.com/) with support for multi-modal.
+- Use GPT-4V for final answer synthesis from join review of images and texts (or tables).
+
 ### RAG Option 3
 
-Folder : [backend/rag_3](backend/rag_3)
+Folder: [backend/rag_3](backend/rag_3)
 
-- Use [Unstructured](https://unstructured.io/) to parse images, text, and tables from documents (PDFs).
+Method:
+
+- Use a multimodal LLM (such as GPT-4V, LLaVA, or FUYU-8b) to produce text summaries from images.
+- Embed and retrieve image summaries with a reference to the raw image.
+- Pass raw images and text chunks to a multimodal LLM for answer synthesis.
+
+Backend:
 - Use the [multi-vector retriever](https://python.langchain.com/docs/modules/data_connection/retrievers/multi_vector) with [Chroma](https://www.trychroma.com/) to store raw text and images along with their summaries for retrieval.
 - Use GPT-4V for both image summarization (for retrieval) as well as final answer synthesis from join review of images and texts (or tables).
 
