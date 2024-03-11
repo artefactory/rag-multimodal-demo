@@ -1,6 +1,6 @@
 from typing import Literal, Optional
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, root_validator
 from pydantic.dataclasses import dataclass
 
 
@@ -25,12 +25,23 @@ class IngestConfig:
     chunking_enable: bool
     chunking_func: HydraObject
 
-    summarize_text: bool
     table_format: Literal["text", "html", "image"]
+    summarize_text: bool
+    summarize_table: bool
 
     metadata_keys: list[str]
 
     export_extracted: bool
+
+    @root_validator(pre=False)
+    def validate_table_format(cls, values):
+        table_format = values.get("table_format")
+        summarize_table = values.get("summarize_table")
+
+        if table_format == "image" and not summarize_table:
+            raise ValueError("summarize_table must be True for table_format=image")
+
+        return values
 
 
 @dataclass(config=ConfigDict(extra="forbid"))

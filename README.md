@@ -24,6 +24,13 @@ Folder : [backend/rag_3](backend/rag_3)
 - Use the [multi-vector retriever](https://python.langchain.com/docs/modules/data_connection/retrievers/multi_vector) with [Chroma](https://www.trychroma.com/) to store raw text and images along with their summaries for retrieval.
 - Use GPT-4V for both image summarization (for retrieval) as well as final answer synthesis from join review of images and texts (or tables).
 
+Parameters:
+- `ingest.table_format` : How to extract tables with Unstructured (`text`, `html` or `image`).
+- `ingest.summarize_text` : Whether to summarize texts with an LLM or use raw texts for retrieval.
+- `ingest.summarize_table` : Whether to summarize tables with LLM or use raw tables for retrieval.
+- `ingest.export_extracted` : Whether to export extracted elements to a local folder.
+- `metadata_keys` : Metadata keys from Unstructured to use.
+
 ## Installation
 
 To set up the project, ensure you have Python version between 3.10 and 3.11. Then install the dependencies using Poetry:

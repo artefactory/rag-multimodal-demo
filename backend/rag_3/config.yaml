@@ -55,8 +55,9 @@ ingest:
     new_after_n_chars: 3800
     combine_text_under_n_chars: 2000
 
-  summarize_text: False
   table_format: "html" # "text" or "html" or "image"
+  summarize_text: False
+  summarize_table: True
 
   export_extracted: True
 

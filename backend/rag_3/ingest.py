@@ -47,12 +47,20 @@ async def apply_summarize_table(table_list: list[Table], config) -> None:
     table_format = config.ingest.table_format
     if table_format in ["text", "html"]:
         str_list = [table.text for table in table_list]
-        model = get_text_llm(config)
 
-        table_summaries = await generate_text_summaries(
-            str_list, prompt_template=prompts.TABLE_SUMMARIZATION_PROMPT, model=model
-        )
+        if config.ingest.summarize_table:
+            model = get_text_llm(config)
+
+            table_summaries = await generate_text_summaries(
+                str_list,
+                prompt_template=prompts.TABLE_SUMMARIZATION_PROMPT,
+                model=model,
+            )
+        else:
+            table_summaries = str_list
     elif config.ingest.table_format == "image":
+        if not config.ingest.summarize_table:
+            raise ValueError("summarize_table must be True for table_format=image")
         img_base64_list = [table.base64 for table in table_list]
         img_mime_type_list = [table.mime_type for table in table_list]
         model = get_vision_llm(config)
