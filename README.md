@@ -51,10 +51,10 @@ make ingest_rag_3
 
 This command will process PDFs to extract images, text, and tables, summarize them, and store the information in the retriever for later retrieval.
 
-2. Launch the web application:
+2. Start the backend server locally:
 
 ```{bash}
-make launch_app
+make serve
 ```
 
 After launching the app, you can interact with the system through the following URLs:
