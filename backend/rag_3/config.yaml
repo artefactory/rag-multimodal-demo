@@ -46,14 +46,13 @@ retriever:
   id_key: "doc_id"
 
 ingest:
-  chunking:
-    enable: True
-    func:
-      _target_: unstructured.chunking.title.chunk_by_title
-      _partial_: True
-      max_characters: 4000
-      new_after_n_chars: 3800
-      combine_text_under_n_chars: 2000
+  chunking_enable: True
+  chunking_func:
+    _target_: unstructured.chunking.title.chunk_by_title
+    _partial_: True
+    max_characters: 4000
+    new_after_n_chars: 3800
+    combine_text_under_n_chars: 2000
 
   summarize_text: False
   table_format: "html" # "text" or "html" or "image"
@@ -61,6 +60,3 @@ ingest:
   metadata_keys:
     - filename
     - page_number
-
-database:
-  url: sqlite:///database/${..version}/rag.sqlite3

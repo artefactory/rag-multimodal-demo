@@ -73,7 +73,7 @@ def select_tables(
 
 
 def load_chunking_func(config) -> Callable:
-    return instantiate(config.ingest.chunking.func)
+    return instantiate(config.ingest.chunking_func)
 
 
 def get_metadata(

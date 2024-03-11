@@ -2,10 +2,10 @@ import asyncio
 from pathlib import Path
 
 import hydra
+from omegaconf import OmegaConf
 from tqdm.auto import tqdm
 from unstructured.partition.pdf import partition_pdf
 
-import backend.rag_3.prompts as prompts
 from backend.utils.elements import Image, Table, Text
 from backend.utils.llm import get_text_llm, get_vision_llm
 from backend.utils.retriever import add_documents, get_retriever
@@ -19,6 +19,9 @@ from backend.utils.unstructured import (
     select_tables,
     select_texts,
 )
+
+from . import prompts
+from .config import Config
 
 
 async def apply_summarize_text(text_list: list[Text], config) -> None:
@@ -100,7 +103,7 @@ async def ingest_pdf(filename, config):
     images = select_images(raw_pdf_elements, config.ingest.metadata_keys)
 
     # Get chunks
-    if config.ingest.chunking.enable:
+    if config.ingest.chunking_enable:
         chunk_func = load_chunking_func(config)
         chunks = chunk_func(raw_pdf_elements)
     else:
@@ -164,6 +167,10 @@ async def ingest_pdf(filename, config):
 
 @hydra.main(config_path=".", config_name="config", version_base=None)
 def main(config):
+    # Validate config
+    cfg_obj = OmegaConf.to_object(config)
+    _ = Config(**cfg_obj)
+
     docs_folder = Path(config.path.docs)
 
     for file_path in tqdm(sorted(docs_folder.glob("**/*.pdf"))):
