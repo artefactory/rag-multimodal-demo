@@ -1,3 +1,10 @@
+import logging
+
+import openai
+from langchain_core.messages import BaseMessage, HumanMessage
+from langchain_core.output_parsers.string import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnableLambda
 from tenacity import (
     before_log,
     retry,
@@ -5,13 +12,6 @@ from tenacity import (
     stop_after_delay,
     wait_exponential,
 )
-import logging
-
-import openai
-from langchain_core.messages import BaseMessage, HumanMessage
-from langchain_core.runnables import RunnableLambda
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.output_parsers.string import StrOutputParser
 
 logger = logging.getLogger(__name__)
 

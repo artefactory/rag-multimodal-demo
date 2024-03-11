@@ -1,8 +1,9 @@
 from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
+from hydra import compose, initialize
 from langserve import add_routes
+
 from backend.rag_3.chain import get_chain as get_chain_rag_3
-from hydra import initialize, compose
 
 app = FastAPI()
 

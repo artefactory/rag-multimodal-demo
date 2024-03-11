@@ -1,8 +1,7 @@
+from typing import Any, Dict, Literal, Optional
+
+from IPython.display import HTML, display
 from pydantic import BaseModel, PrivateAttr
-from typing import Optional, Dict
-from typing import Literal
-from typing import Any
-from IPython.display import display, HTML
 
 
 class Element(BaseModel):

@@ -1,11 +1,9 @@
-from hydra.utils import instantiate
-from langchain_core.retrievers import BaseRetriever
-
 import uuid
-
-from langchain_core.documents import Document
-
 from typing import Optional
+
+from hydra.utils import instantiate
+from langchain_core.documents import Document
+from langchain_core.retrievers import BaseRetriever
 
 
 def get_retriever(config) -> BaseRetriever:

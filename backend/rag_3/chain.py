@@ -1,10 +1,11 @@
+from langchain_core.messages import HumanMessage
+from langchain_core.output_parsers.string import StrOutputParser
+from langchain_core.runnables import RunnableLambda, RunnablePassthrough
+
+import backend.rag_3.prompts as prompts
+from backend.utils.image import resize_base64_image
 from backend.utils.llm import get_vision_llm
 from backend.utils.retriever import get_retriever
-from langchain_core.runnables import RunnableLambda, RunnablePassthrough
-from langchain_core.output_parsers.string import StrOutputParser
-from backend.utils.image import resize_base64_image
-from langchain_core.messages import HumanMessage
-import backend.rag_3.prompts as prompts
 
 
 def split_image_text_types(docs):

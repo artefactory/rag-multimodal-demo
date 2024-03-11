@@ -1,13 +1,14 @@
+from typing import Any, Callable
+
 import unstructured.documents.elements as unstructured_elements
 from hydra.utils import instantiate
-from typing import Callable
-from typing import Any
-from backend.utils.elements import Image, Text, TableImage, TableText, Table
+
+from backend.utils.elements import Image, Table, TableImage, TableText, Text
 
 
 def select_images(
     raw_pdf_elements: list[unstructured_elements.Element],
-    metadata_keys: list[str] = [],
+    metadata_keys: list[str] | None = None,
 ) -> list[Image]:
     images = []
     for element in raw_pdf_elements:
@@ -23,7 +24,7 @@ def select_images(
 
 def select_texts(
     raw_pdf_elements: list[unstructured_elements.Element],
-    metadata_keys: list[str] = [],
+    metadata_keys: list[str] | None = None,
 ) -> list[Text]:
     texts = []
     for element in raw_pdf_elements:
@@ -39,7 +40,7 @@ def select_texts(
 def select_tables(
     raw_pdf_elements: list[unstructured_elements.Element],
     table_format: str,
-    metadata_keys: list[str] = [],
+    metadata_keys: list[str] | None = None,
 ) -> list[Table]:
     tables = []
     for element in raw_pdf_elements:
@@ -76,6 +77,8 @@ def load_chunking_func(config) -> Callable:
 
 
 def get_metadata(
-    elements: unstructured_elements.Element, keys: list[str]
+    elements: unstructured_elements.Element, keys: list[str] | None = None
 ) -> dict[str, Any]:
+    if keys is None:
+        keys = []
     return {key: getattr(elements.metadata, key) for key in keys}

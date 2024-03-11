@@ -1,24 +1,24 @@
-from backend.utils.unstructured import (
-    select_images,
-    select_texts,
-    select_tables,
-    load_chunking_func,
-)
+import asyncio
+from pathlib import Path
+
+import hydra
+from tqdm.auto import tqdm
+from unstructured.partition.pdf import partition_pdf
+
+import backend.rag_3.prompts as prompts
+from backend.utils.elements import Image, Table, Text
+from backend.utils.llm import get_text_llm, get_vision_llm
+from backend.utils.retriever import add_documents, get_retriever
 from backend.utils.summarization import (
     generate_image_summaries,
     generate_text_summaries,
 )
-
-from backend.utils.elements import Image, Text, Table
-from backend.utils.llm import get_vision_llm, get_text_llm
-import backend.rag_3.prompts as prompts
-from backend.utils.retriever import get_retriever, add_documents
-import asyncio
-from tqdm.auto import tqdm
-from pathlib import Path
-from unstructured.partition.pdf import partition_pdf
-
-import hydra
+from backend.utils.unstructured import (
+    load_chunking_func,
+    select_images,
+    select_tables,
+    select_texts,
+)
 
 
 async def apply_summarize_text(text_list: list[Text], config) -> None:
