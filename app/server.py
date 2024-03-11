@@ -4,6 +4,8 @@ from hydra import compose, initialize
 from langserve import add_routes
 from omegaconf import OmegaConf
 
+from backend.rag_1.chain import get_chain as get_chain_rag_1
+from backend.rag_1.config import Config as Config_1
 from backend.rag_3.chain import get_chain as get_chain_rag_3
 from backend.rag_3.config import Config as Config_3
 
@@ -15,6 +17,14 @@ async def redirect_root_to_docs():
     return RedirectResponse("/docs")
 
 
+with initialize(config_path="../backend/rag_1", version_base=None):
+    config_1 = compose(config_name="config")
+    print(config_1)
+
+    # validate config
+    cfg_obj = OmegaConf.to_object(config_1)
+    _ = Config_1(**cfg_obj)
+
 with initialize(config_path="../backend/rag_3", version_base=None):
     config_3 = compose(config_name="config")
     print(config_3)
@@ -22,6 +32,10 @@ with initialize(config_path="../backend/rag_3", version_base=None):
     # validate config
     cfg_obj = OmegaConf.to_object(config_3)
     _ = Config_3(**cfg_obj)
+
+
+chain_rag_1 = get_chain_rag_1(config_1)
+add_routes(app, chain_rag_1, path="/rag-1")
 
 chain_rag_3 = get_chain_rag_3(config_3)
 add_routes(app, chain_rag_3, path="/rag-3")

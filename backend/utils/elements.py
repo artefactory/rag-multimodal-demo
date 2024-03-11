@@ -1,4 +1,5 @@
 import base64
+import tempfile
 from pathlib import Path
 from typing import Any, Dict, Literal, Optional
 
@@ -129,6 +130,15 @@ class Image(Element):
         file_path = Path(folder_path) / f"{filename}.{extension}"
         with file_path.open("wb") as file:
             file.write(base64.b64decode(self.base64))
+
+    def get_local_path(self) -> Path:
+        extension = self.mime_type.split("/")[1]
+        # Create a temporary file to store the image and return the path
+        with tempfile.NamedTemporaryFile(
+            suffix=f".{extension}", delete=False
+        ) as temp_file:
+            temp_file.write(base64.b64decode(self.base64))
+            return Path(temp_file.name)
 
 
 class Table(Element):
