@@ -166,3 +166,4 @@ database/*
 outputs/*
 
 !/**/.gitkeep
+!docs/Attention.pdf
