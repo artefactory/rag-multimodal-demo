@@ -55,7 +55,7 @@ ingest:
     new_after_n_chars: 3800
     combine_text_under_n_chars: 2000
 
-  table_format: "html" # "text" or "html" or "image"
+  table_format: "image" # "text" or "html" or "image"
   summarize_text: False
   summarize_table: True
 
