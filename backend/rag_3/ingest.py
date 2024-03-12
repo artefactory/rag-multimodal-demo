@@ -3,10 +3,12 @@ import shutil
 from pathlib import Path
 
 import hydra
-from omegaconf import OmegaConf
+from omegaconf.dictconfig import DictConfig
 from tqdm.auto import tqdm
 from unstructured.partition.pdf import partition_pdf
 
+from backend.rag_3 import prompts
+from backend.rag_3.config import validate_config
 from backend.utils.elements import Image, Table, Text
 from backend.utils.llm import get_text_llm, get_vision_llm
 from backend.utils.retriever import add_documents_multivector, get_retriever
@@ -20,9 +22,6 @@ from backend.utils.unstructured import (
     select_tables,
     select_texts,
 )
-
-from . import prompts
-from .config import Config
 
 
 async def apply_summarize_text(text_list: list[Text], config) -> None:
@@ -190,10 +189,9 @@ async def ingest_pdf(file_path, config):
 
 
 @hydra.main(config_path=".", config_name="config", version_base=None)
-def main(config):
+def main(config: DictConfig):
     # Validate config
-    cfg_obj = OmegaConf.to_object(config)
-    _ = Config(**cfg_obj)
+    _ = validate_config(config)
 
     docs_folder = Path(config.path.docs)
 

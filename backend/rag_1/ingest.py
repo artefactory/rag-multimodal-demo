@@ -2,10 +2,11 @@ import shutil
 from pathlib import Path
 
 import hydra
-from omegaconf import OmegaConf
+from omegaconf.dictconfig import DictConfig
 from tqdm.auto import tqdm
 from unstructured.partition.pdf import partition_pdf
 
+from backend.rag_1.config import validate_config
 from backend.utils.unstructured import (
     load_chunking_func,
     select_images,
@@ -13,8 +14,6 @@ from backend.utils.unstructured import (
     select_texts,
 )
 from backend.utils.vectorstore import get_vectorstore
-
-from .config import Config
 
 
 def ingest_pdf(file_path, config):
@@ -99,10 +98,9 @@ def ingest_pdf(file_path, config):
 
 
 @hydra.main(config_path=".", config_name="config", version_base=None)
-def main(config):
+def main(config: DictConfig):
     # Validate config
-    cfg_obj = OmegaConf.to_object(config)
-    _ = Config(**cfg_obj)
+    _ = validate_config(config)
 
     docs_folder = Path(config.path.docs)
 

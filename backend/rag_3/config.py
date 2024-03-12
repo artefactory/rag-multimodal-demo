@@ -1,5 +1,7 @@
 from typing import Literal, Optional
 
+from omegaconf import OmegaConf
+from omegaconf.dictconfig import DictConfig
 from pydantic import BaseModel, ConfigDict, root_validator
 from pydantic.dataclasses import dataclass
 
@@ -58,3 +60,11 @@ class Config:
     retriever: HydraObject
 
     ingest: IngestConfig
+
+
+def validate_config(config: DictConfig) -> Config:
+    # Resolve the DictConfig to a native Python object
+    cfg_obj = OmegaConf.to_object(config)
+    # Instantiate the Config class
+    validated_config = Config(**cfg_obj)
+    return validated_config
