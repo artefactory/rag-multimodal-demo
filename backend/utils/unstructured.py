@@ -61,7 +61,7 @@ def select_tables(
             elif table_format == "image":
                 table = TableImage(
                     base64=element.metadata.image_base64,
-                    mime_type=element.metadata.mime_type,
+                    mime_type=element.metadata.image_mime_type,
                     format=table_format,
                     metadata=metadata,
                 )
