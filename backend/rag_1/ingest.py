@@ -43,7 +43,7 @@ def ingest_pdf(file_path, config):
 
     vectorstore = get_vectorstore(config)
 
-    # Add texts to retriever
+    # Add texts to vectorstore
     text_contents = [text.get_content() for text in texts]
     text_metadata = [text.get_metadata() for text in texts]
 
@@ -52,7 +52,7 @@ def ingest_pdf(file_path, config):
         metadatas=text_metadata,
     )
 
-    # Add tables to retriever
+    # Add tables to vectorstore
     table_contents = [table.get_content() for table in tables]
     table_metadata = [table.get_metadata() for table in tables]
 
@@ -61,7 +61,7 @@ def ingest_pdf(file_path, config):
         metadatas=table_metadata,
     )
 
-    # Add tables to retriever
+    # Add tables to vectorstore
     table_contents = [table.get_content() for table in tables]
     table_metadata = [table.get_metadata() for table in tables]
 
