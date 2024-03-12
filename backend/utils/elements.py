@@ -1,5 +1,6 @@
 import base64
 import tempfile
+from abc import abstractmethod
 from pathlib import Path
 from typing import Any, Dict, Literal, Optional
 
@@ -9,15 +10,18 @@ from pydantic import BaseModel, PrivateAttr
 
 class Element(BaseModel):
     type: Literal["text", "image", "table"]
+    format: Literal["text", "html", "markdown", "image"]
     metadata: Dict[str, Any] = {}
     _summary: Optional[str] = PrivateAttr(None)
 
+    @abstractmethod
     def get_content(self):
-        raise NotImplementedError
+        pass
 
     def get_metadata(self):
         return {
             "type": self.type,
+            "format": self.format,
             **self.metadata,
         }
 
@@ -29,8 +33,9 @@ class Element(BaseModel):
             raise ValueError("Summary not available")
         return self._summary
 
+    @abstractmethod
     def _display_content(self):
-        raise NotImplementedError
+        pass
 
     def _display_summary(self):
         if self._summary is not None:
@@ -57,8 +62,9 @@ class Element(BaseModel):
         self._export_content(folder_path, filename)
         self._export_summary(folder_path, filename)
 
+    @abstractmethod
     def _export_content(self, folder_path: Path | str, filename: str):
-        raise NotImplementedError
+        pass
 
     def _export_summary(self, folder_path: Path | str, filename: str):
         if self._summary is not None:
@@ -68,18 +74,11 @@ class Element(BaseModel):
 
 class Text(Element):
     type: Literal["text"] = "text"
+    format: Literal["text", "html", "markdown"]
     text: str
-    format: Literal["text", "html", "markdown"] = "text"
 
     def get_content(self):
         return self.text
-
-    def get_metadata(self):
-        return {
-            "type": self.type,
-            "format": self.format,
-            **self.metadata,
-        }
 
     def _display_content(self):
         match self.format:
@@ -109,8 +108,9 @@ class Text(Element):
 
 class Image(Element):
     type: Literal["image"] = "image"
-    base64: str
+    format: Literal["image"] = "image"
     mime_type: Literal["image/jpeg", "image/png"]
+    base64: str
 
     def get_content(self):
         return self.base64
@@ -118,6 +118,7 @@ class Image(Element):
     def get_metadata(self):
         return {
             "type": self.type,
+            "format": self.format,
             "mime_type": self.mime_type,
             **self.metadata,
         }
@@ -143,14 +144,6 @@ class Image(Element):
 
 class Table(Element):
     type: Literal["table"] = "table"
-    format: Literal["text", "html", "markdown", "image"]
-
-    def get_metadata(self):
-        return {
-            "type": self.type,
-            "format": self.format,
-            **self.metadata,
-        }
 
 
 class TableText(Table, Text):
@@ -166,7 +159,10 @@ def langchain_doc_to_element(docs: list):
     for doc in docs:
         match doc.metadata["type"]:
             case "text":
-                element = Text(text=doc.page_content, metadata=doc.metadata)
+                text_format = doc.metadata["format"]
+                element = Text(
+                    text=doc.page_content, format=text_format, metadata=doc.metadata
+                )
             case "image":
                 element = Image(
                     base64=doc.page_content,

@@ -31,6 +31,7 @@ def select_texts(
         if isinstance(element, unstructured_elements.CompositeElement):
             text = Text(
                 text=element.text,
+                format="text",
                 metadata=get_metadata(element, metadata_keys),
             )
             texts.append(text)
