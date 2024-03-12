@@ -63,7 +63,7 @@ Parameters:
 
 To set up the project, ensure you have Python version between 3.10 and 3.11. Then install the dependencies using Poetry:
 
-```{bash}
+```bash
 poetry install
 ```
 
@@ -81,8 +81,13 @@ To use the RAG Multimodal Demo, follow these steps:
 
 1. Ingest data from PDFs and summarize the content:
 
-```{bash}
+For RAG Option 1:
+```bash
 make ingest_rag_1
+```
+
+For RAG Option 3:
+```bash
 make ingest_rag_3
 ```
 
@@ -91,18 +96,22 @@ and store the information in the retriever for later retrieval.
 
 2. Start the backend server locally:
 
-```{bash}
+```bash
 make serve
 ```
 
-After launching the app, you can interact with the system through the following URLs:
+This command will launch the backend server, allowing you to access the FastAPI documentation and playground interfaces :
 - FastAPI documentation: http://0.0.0.0:8000/docs
-- RAG 3 playground interface: http://0.0.0.0:8000/rag-1/playground/
+- RAG 1 playground interface: http://0.0.0.0:8000/rag-1/playground/
 - RAG 3 playground interface: http://0.0.0.0:8000/rag-3/playground/
 
 ## Development
 
-```{bash}
+To set up a development environment and install pre-commit hooks, run the following commands:
+
+```bash
 poetry install --with dev
 pre-commit install
 ```
+
+If Poetry is not installed, you can install it using the following instructions: [Poetry Installation](https://python-poetry.org/docs/#installing-with-pipx)
