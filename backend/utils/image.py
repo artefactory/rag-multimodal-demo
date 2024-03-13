@@ -2,6 +2,7 @@
 
 import base64
 import io
+from pathlib import Path
 
 from PIL import Image
 
@@ -32,3 +33,16 @@ def resize_base64_image(
 
     # Encode the resized image to Base64
     return base64.b64encode(buffered.getvalue()).decode("utf-8")
+
+
+def local_image_to_base64(image_path: str) -> str:
+    """Convert a local image to a Base64 string.
+
+    Args:
+        image_path (str): Path to the image.
+
+    Returns:
+        str: Base64 string.
+    """
+    with Path(image_path).open("rb") as image_file:
+        return base64.b64encode(image_file.read()).decode("utf-8")
