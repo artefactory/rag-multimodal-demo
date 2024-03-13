@@ -41,10 +41,9 @@ ingest:
     new_after_n_chars: 3800
     combine_text_under_n_chars: 2000
 
-  table_format: "html" # "text" or "html" or "image"
-
-  export_extracted: True
-
   metadata_keys:
     - filename
     - page_number
+  table_format: "html" # "text" or "html" or "image"
+
+  export_extracted: True

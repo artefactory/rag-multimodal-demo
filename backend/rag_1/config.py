@@ -39,9 +39,8 @@ class IngestConfig:
     chunking_enable: bool
     chunking_func: HydraObject
 
-    table_format: Literal["text", "html", "image"]
-
     metadata_keys: list[str]
+    table_format: Literal["text", "html", "image"]
 
     export_extracted: bool
 

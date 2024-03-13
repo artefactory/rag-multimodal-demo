@@ -57,6 +57,7 @@ def ingest_pdf(file_path: str | Path, config: DictConfig) -> None:
     vectorstore = get_vectorstore(config)
 
     # Add texts to vectorstore
+    logger.info("Adding texts to vectorstore")
     text_contents = [text.get_content() for text in texts]
     text_metadata = [text.get_metadata() for text in texts]
 
@@ -66,6 +67,7 @@ def ingest_pdf(file_path: str | Path, config: DictConfig) -> None:
     )
 
     # Add tables to vectorstore
+    logger.info("Adding tables to vectorstore")
     table_contents = [table.get_content() for table in tables]
     table_metadata = [table.get_metadata() for table in tables]
 
@@ -75,6 +77,7 @@ def ingest_pdf(file_path: str | Path, config: DictConfig) -> None:
     )
 
     # Add images to retriever
+    logger.info("Adding images to vectorstore")
     image_path = [image.get_local_path() for image in images]
     image_metadata = [image.get_metadata() for image in images]
 
