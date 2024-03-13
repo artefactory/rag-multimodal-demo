@@ -1,6 +1,10 @@
+"""Provides functions to generate text and image summaries using OpenAI's models."""
+
 import logging
+from collections.abc import Sequence
 
 import openai
+from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.messages import BaseMessage, HumanMessage
 from langchain_core.output_parsers.string import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
@@ -24,8 +28,23 @@ logger = logging.getLogger(__name__)
     # after=after_log(logger, logging.INFO),
 )
 async def generate_text_summaries(
-    text_list, prompt_template: str, model, batch_size=50
+    text_list: list[str],
+    prompt_template: str,
+    model: BaseChatModel,
+    batch_size: int = 50,
 ) -> list[str]:
+    """Generate summaries for a list of texts.
+
+    Args:
+        text_list (list[str]): List of texts to be summarized.
+        prompt_template (str): Template used to create prompts for the language model.
+        model (BaseChatModel): Language model used for generating summaries.
+        batch_size (int, optional): Number of texts to process simultaneously in the API
+            request. Defaults to 50.
+
+    Returns:
+        list[str]: List of summaries for the texts.
+    """
     # Prompt
     prompt = ChatPromptTemplate.from_template(prompt_template)
 
@@ -57,12 +76,26 @@ async def generate_image_summaries(
     img_base64_list: list[str],
     img_mime_type_list: list[str],
     prompt: str,
-    model,
-    batch_size=50,
+    model: BaseChatModel,
+    batch_size: int = 50,
 ) -> list[str]:
+    """Generate summaries for a list of images encoded in base64.
+
+    Args:
+        img_base64_list (list[str]): List of base64-encoded strings representing images.
+        img_mime_type_list (list[str]): List of MIME types corresponding to the images.
+            Example: ["image/jpeg", "image/png"]
+        prompt (str): Text prompt used for generating the summaries.
+        model (BaseChatModel): Language model used for generating summaries.
+        batch_size (int, optional): Number of images to process simultaneously in the
+            API request. Defaults to 50.
+
+    Returns:
+        list[str]: List of summaries for the images.
+    """
     assert len(img_base64_list) == len(img_mime_type_list)
 
-    def _get_messages_from_url(_dict: dict[str, str]) -> list[BaseMessage]:
+    def _get_messages_from_url(_dict: dict[str, str]) -> Sequence[BaseMessage]:
         img_base64, img_mime_type = _dict["img_base64"], _dict["img_mime_type"]
         messages = [
             HumanMessage(
@@ -97,6 +130,7 @@ async def generate_image_summaries(
             for img_base64, img_mime_type in zip(
                 img_base64_list[i : i + batch_size],
                 img_mime_type_list[i : i + batch_size],
+                strict=False,
             )
         ]
         batch_summaries = await chain.abatch(batch)

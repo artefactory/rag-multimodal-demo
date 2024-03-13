@@ -1,4 +1,6 @@
-from typing import Literal, Optional
+"""Configuration schema for the RAG Option 3."""
+
+from typing import Literal
 
 from omegaconf import OmegaConf
 from omegaconf.dictconfig import DictConfig
@@ -7,16 +9,22 @@ from pydantic.dataclasses import dataclass
 
 
 class HydraObject(BaseModel):
+    """Configuration for objects to be instantiated by Hydra."""
+
     target: str
-    partial: Optional[bool]
+    partial: bool | None
 
     class Config:
+        """Pydantic configuration."""
+
         extra = "allow"
         fields = {"target": "_target_", "partial": "_partial_"}
 
 
 @dataclass(config=ConfigDict(extra="forbid"))
 class PathConfig:
+    """Configuration for paths."""
+
     docs: str
     database: str
     export_extracted: str
@@ -24,6 +32,8 @@ class PathConfig:
 
 @dataclass(config=ConfigDict(extra="forbid"))
 class IngestConfig:
+    """Configuration for PDF ingestion."""
+
     chunking_enable: bool
     chunking_func: HydraObject
 
@@ -36,7 +46,22 @@ class IngestConfig:
     export_extracted: bool
 
     @root_validator(pre=False)
-    def validate_table_format(cls, values):
+    def validate_table_format(cls, values: dict) -> dict:
+        """Validate the 'table_format' field in relation to 'summarize_table'.
+
+        This validator ensures that if the 'table_format' is set to 'image',
+        then 'summarize_table' must also be set to True. It enforces the rule
+        that image tables require summarization.
+
+        Args:
+            values (dict): Dictionnary of field values for the IngestConfig class.
+
+        Raises:
+            ValueError: If 'table_format' is 'image' and 'summarize_table' is not True.
+
+        Returns:
+            dict: The validated field values.
+        """
         table_format = values.get("table_format")
         summarize_table = values.get("summarize_table")
 
@@ -48,6 +73,8 @@ class IngestConfig:
 
 @dataclass(config=ConfigDict(extra="forbid"))
 class Config:
+    """Configuration for the RAG Option 3."""
+
     name: str
 
     path: PathConfig
@@ -63,6 +90,14 @@ class Config:
 
 
 def validate_config(config: DictConfig) -> Config:
+    """Validate the configuration.
+
+    Args:
+        config (DictConfig): Configuration object.
+
+    Returns:
+        Config: Validated configuration object.
+    """
     # Resolve the DictConfig to a native Python object
     cfg_obj = OmegaConf.to_object(config)
     # Instantiate the Config class

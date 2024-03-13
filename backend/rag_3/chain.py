@@ -1,6 +1,11 @@
-from langchain_core.messages import HumanMessage
+"""RAG chain for Option 3."""
+
+from langchain_core.documents import Document
+from langchain_core.messages import BaseMessage, HumanMessage
 from langchain_core.output_parsers.string import StrOutputParser
 from langchain_core.runnables import RunnableLambda, RunnablePassthrough
+from langchain_core.runnables.base import RunnableSequence
+from omegaconf.dictconfig import DictConfig
 
 from backend.utils.image import resize_base64_image
 from backend.utils.llm import get_vision_llm
@@ -9,9 +14,14 @@ from backend.utils.retriever import get_retriever
 from . import prompts
 
 
-def split_image_text_types(docs):
-    """
-    Split base64-encoded images and texts
+def split_image_text_types(docs: list[Document]) -> dict[str, list]:
+    """Split base64-encoded images and texts.
+
+    Args:
+        docs (list[Document]): List of documents.
+
+    Returns:
+        dict[str, list]: Dictionary containing lists of images, mime types, and texts.
     """
     img_base64_list = []
     img_mime_type_list = []
@@ -41,9 +51,14 @@ def split_image_text_types(docs):
     }
 
 
-def img_prompt_func(data_dict):
-    """
-    Join the context into a single string
+def img_prompt_func(data_dict: dict) -> list[BaseMessage]:
+    """Join the context into a single string.
+
+    Args:
+        data_dict (dict): Dictionary containing the context and question.
+
+    Returns:
+        list[BaseMessage]: List of messages to be sent to the model.
     """
     formatted_texts = "\n".join(data_dict["context"]["texts"])
     messages = []
@@ -68,7 +83,22 @@ def img_prompt_func(data_dict):
     return [HumanMessage(content=messages)]
 
 
-def get_chain(config):
+def get_chain(config: DictConfig) -> RunnableSequence:
+    """Constructs a RAG pipeline that retrieves image and text data from documents.
+
+    The pipeline consists of the following steps:
+    1. Retrieval of documents using a retriever object.
+    2. Splitting of image and text data.
+    3. Prompting the model with the image and text data.
+    4. Generating responses using a vision language model.
+    5. Parsing the string output.
+
+    Args:
+        config (DictConfig): Configuration object.
+
+    Returns:
+        RunnableSequence: RAG pipeline.
+    """
     retriever = get_retriever(config)
     model = get_vision_llm(config)
 

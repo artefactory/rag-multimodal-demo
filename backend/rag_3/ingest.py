@@ -1,3 +1,5 @@
+"""Ingest PDF files into the vectorstore for RAG Option 3."""
+
 import asyncio
 import shutil
 from pathlib import Path
@@ -24,7 +26,15 @@ from backend.utils.unstructured import (
 )
 
 
-async def apply_summarize_text(text_list: list[Text], config) -> None:
+async def apply_summarize_text(text_list: list[Text], config: DictConfig) -> None:
+    """Apply text summarization to a list of Text elements.
+
+    The function directly modifies the Text elements inplace.
+
+    Args:
+        text_list (list[Text]): List of Text elements.
+        config (DictConfig): Configuration object.
+    """
     str_list = [text.text for text in text_list]
 
     if config.ingest.summarize_text:
@@ -42,7 +52,19 @@ async def apply_summarize_text(text_list: list[Text], config) -> None:
     return
 
 
-async def apply_summarize_table(table_list: list[Table], config) -> None:
+async def apply_summarize_table(table_list: list[Table], config: DictConfig) -> None:
+    """Apply table summarization to a list of Table elements.
+
+    The function directly modifies the Table elements inplace.
+
+    Args:
+        table_list (list[Table]): List of Table elements.
+        config (DictConfig): Configuration object.
+
+    Raises:
+        ValueError: If the table format is "image" and summarize_table is False.
+        ValueError: If the table format is invalid.
+    """
     table_format = config.ingest.table_format
     if table_format in ["text", "html"]:
         str_list = [table.text for table in table_list]
@@ -79,7 +101,15 @@ async def apply_summarize_table(table_list: list[Table], config) -> None:
     return
 
 
-async def apply_summarize_image(image_list: list[Image], config) -> None:
+async def apply_summarize_image(image_list: list[Image], config: DictConfig) -> None:
+    """Apply image summarization to a list of Image elements.
+
+    The function directly modifies the Image elements inplace.
+
+    Args:
+        image_list (list[Image]): List of Image elements.
+        config (DictConfig): Configuration object.
+    """
     img_base64_list = [image.base64 for image in image_list]
     img_mime_type_list = [image.mime_type for image in image_list]
 
@@ -98,7 +128,13 @@ async def apply_summarize_image(image_list: list[Image], config) -> None:
     return
 
 
-async def ingest_pdf(file_path, config):
+async def ingest_pdf(file_path: str | Path, config: DictConfig) -> None:
+    """Ingest a PDF file.
+
+    Args:
+        file_path (str | Path): Path to the PDF file.
+        config (DictConfig): Configuration object.
+    """
     # Get elements
     raw_pdf_elements = partition_pdf(
         filename=file_path,
@@ -141,9 +177,9 @@ async def ingest_pdf(file_path, config):
 
     add_documents_multivector(
         retriever=retriever,
-        doc_summaries=text_summaries,
-        doc_contents_str=text_contents,
-        doc_metadata=text_metadata,
+        summary_list=text_summaries,
+        content_list=text_contents,
+        metadata_list=text_metadata,
     )
 
     # Add tables to retriever
@@ -153,9 +189,9 @@ async def ingest_pdf(file_path, config):
 
     add_documents_multivector(
         retriever=retriever,
-        doc_summaries=table_summaries,
-        doc_contents_str=table_contents,
-        doc_metadata=table_metadata,
+        summary_list=table_summaries,
+        content_list=table_contents,
+        metadata_list=table_metadata,
     )
 
     # Add images to retriever
@@ -165,9 +201,9 @@ async def ingest_pdf(file_path, config):
 
     add_documents_multivector(
         retriever=retriever,
-        doc_summaries=image_summaries,
-        doc_contents_str=image_contents,
-        doc_metadata=image_metadata,
+        summary_list=image_summaries,
+        content_list=image_contents,
+        metadata_list=image_metadata,
     )
 
     # Export extracted elements
@@ -189,7 +225,12 @@ async def ingest_pdf(file_path, config):
 
 
 @hydra.main(config_path=".", config_name="config", version_base=None)
-def main(config: DictConfig):
+def main(config: DictConfig) -> None:
+    """Ingest all PDF files in the docs folder.
+
+    Args:
+        config (DictConfig): Configuration object.
+    """
     # Validate config
     _ = validate_config(config)
 

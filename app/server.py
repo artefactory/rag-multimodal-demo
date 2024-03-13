@@ -1,3 +1,5 @@
+"""Set up a FastAPI application with routes for different RAG models."""
+
 from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
 from hydra import compose, initialize
@@ -12,7 +14,8 @@ app = FastAPI()
 
 
 @app.get("/")
-async def redirect_root_to_docs():
+async def redirect_root_to_docs() -> RedirectResponse:
+    """Redirect the root URL to the /docs endpoint."""
     return RedirectResponse("/docs")
 
 
