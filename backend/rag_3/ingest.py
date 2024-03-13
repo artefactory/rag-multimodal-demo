@@ -1,6 +1,7 @@
 """Ingest PDF files into the vectorstore for RAG Option 3."""
 
 import asyncio
+import logging
 import shutil
 from pathlib import Path
 
@@ -24,6 +25,8 @@ from backend.utils.unstructured import (
     select_tables,
     select_texts,
 )
+
+logger = logging.getLogger(__name__)
 
 
 async def apply_summarize_text(text_list: list[Text], config: DictConfig) -> None:
@@ -135,6 +138,8 @@ async def ingest_pdf(file_path: str | Path, config: DictConfig) -> None:
         file_path (str | Path): Path to the PDF file.
         config (DictConfig): Configuration object.
     """
+    logger.info(f"Processing {file_path}")
+
     # Get elements
     raw_pdf_elements = partition_pdf(
         filename=file_path,
@@ -233,6 +238,12 @@ def main(config: DictConfig) -> None:
     """
     # Validate config
     _ = validate_config(config)
+
+    # Clear database
+    if config.ingest.clear_database:
+        database_folder = Path(config.path.database)
+        logger.info(f"Clearing database: {database_folder}")
+        shutil.rmtree(database_folder, ignore_errors=True)
 
     docs_folder = Path(config.path.docs)
 

@@ -34,6 +34,8 @@ class PathConfig:
 class IngestConfig:
     """Configuration for PDF ingestion."""
 
+    clear_database: bool
+
     chunking_enable: bool
     chunking_func: HydraObject
 

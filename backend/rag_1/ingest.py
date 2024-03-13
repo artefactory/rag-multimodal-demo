@@ -1,5 +1,6 @@
 """Ingest PDF files into the vectorstore for RAG Option 1."""
 
+import logging
 import shutil
 from pathlib import Path
 
@@ -17,6 +18,8 @@ from backend.utils.unstructured import (
 )
 from backend.utils.vectorstore import get_vectorstore
 
+logger = logging.getLogger(__name__)
+
 
 def ingest_pdf(file_path: str | Path, config: DictConfig) -> None:
     """Ingest a PDF file.
@@ -25,6 +28,8 @@ def ingest_pdf(file_path: str | Path, config: DictConfig) -> None:
         file_path (str | Path): Path to the PDF file.
         config (DictConfig): Configuration object.
     """
+    logger.info(f"Processing {file_path}")
+
     # Get elements
     raw_pdf_elements = partition_pdf(
         filename=file_path,
@@ -115,6 +120,13 @@ def main(config: DictConfig) -> None:
     # Validate config
     _ = validate_config(config)
 
+    # Clear database
+    if config.ingest.clear_database:
+        database_folder = Path(config.path.database)
+        logger.info(f"Clearing database: {database_folder}")
+        shutil.rmtree(database_folder, ignore_errors=True)
+
+    # Ingest all PDF files in the docs folder
     docs_folder = Path(config.path.docs)
 
     for file_path in tqdm(sorted(docs_folder.glob("**/*.pdf"))):

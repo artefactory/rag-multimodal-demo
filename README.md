@@ -36,6 +36,7 @@ Backend:
 
 Parameters:
 
+- `ingest.clear_database` : Whether to clear the database before ingesting new data.
 - `ingest.table_format` : How to extract table with Unstructured (`text`, `html` or `image`).
 - `ingest.export_extracted` : Whether to export extracted elements in local folder.
 - `metadata_keys` : Unstructured metadata to use.
@@ -58,6 +59,7 @@ Backend:
 
 Parameters:
 
+- `ingest.clear_database` : Whether to clear the database before ingesting new data.
 - `ingest.table_format` : How to extract tables with Unstructured (`text`, `html` or `image`).
 - `ingest.summarize_text` : Whether to summarize texts with an LLM or use raw texts for retrieval.
 - `ingest.summarize_table` : Whether to summarize tables with LLM or use raw tables for retrieval.
