@@ -8,7 +8,7 @@ from typing import Any, Literal
 
 from IPython.display import HTML, Markdown, display
 from langchain_core.documents import Document
-from pydantic import BaseModel, PrivateAttr
+from pydantic import BaseModel, PrivateAttr, validator
 
 
 class Element(BaseModel):
@@ -58,6 +58,7 @@ class Element(BaseModel):
         Args:
             summary (str): The summary to set.
         """
+        summary = validate_string(summary)
         self._summary = summary
 
     def get_summary(self) -> str:
@@ -122,6 +123,37 @@ class Element(BaseModel):
         if self._summary is not None:
             file_path = Path(folder_path) / f"{filename}.summary"
             file_path.write_text(self._summary)
+
+    @validator("*", pre=True)
+    def validate_string_field(cls, value: Any) -> Any:  # noqa: ANN401
+        """Validates that the string fields are not empty.
+
+        Args:
+            value (Any): Value of the field to validate.
+
+        Returns:
+            Any: Validated value.
+        """
+        if isinstance(value, str):
+            return validate_string(value)
+        return value
+
+
+def validate_string(value: str) -> str:
+    """Validates that a string is not empty.
+
+    Args:
+        value (str): String to validate.
+
+    Raises:
+        ValueError: If the string is empty.
+
+    Returns:
+        str: Validated string.
+    """
+    if not value.strip():
+        raise ValueError("String cannot be empty")
+    return value
 
 
 class Text(Element):
