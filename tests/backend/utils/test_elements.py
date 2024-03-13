@@ -1,4 +1,7 @@
+"""Unit tests for the elements module in the backend utils."""
+
 import pytest
+from pytest import FixtureRequest
 from pytest_lazy_fixtures import lf
 
 from backend.utils.elements import Element, Image, Table, TableImage, TableText, Text
@@ -18,11 +21,13 @@ from backend.utils.elements import Element, Image, Table, TableImage, TableText,
         },
     ]
 )
-def text_element(request):
+def text_element(request: FixtureRequest) -> Text:
+    """Provides different configurations of Text element."""
     return Text(**request.param)
 
 
-def test_text(text_element):
+def test_text(text_element: Text) -> None:
+    """Test the Text element."""
     assert text_element.get_content() == text_element.text
 
     assert text_element.get_metadata() == {
@@ -34,7 +39,8 @@ def test_text(text_element):
 
 @pytest.mark.parametrize("type", ["text", "table", "image"])
 @pytest.mark.parametrize("format", ["text", "html", "markdown", "image"])
-def test_text_error(type, format):
+def test_text_error(type: str, format: str) -> None:
+    """Test the error cases for the Text element."""
     if type == "text" and format in ["text", "html", "markdown"]:
         Text(text="Hello, World!", format=format, type=type)
     else:
@@ -51,7 +57,8 @@ def test_text_error(type, format):
         {"text": "Hello, World!", "format": "htm"},
     ],
 )
-def test_text_error_2(kwargs):
+def test_text_error_2(kwargs: dict) -> None:
+    """Test the error cases for the Text element."""
     with pytest.raises(ValueError):
         Text(**kwargs)
 
@@ -95,11 +102,13 @@ def test_text_error_2(kwargs):
         },
     ]
 )
-def image_element(request):
+def image_element(request: FixtureRequest) -> Image:
+    """Provides different configurations of Image element."""
     return Image(**request.param)
 
 
-def test_image(image_element):
+def test_image(image_element: Image) -> None:
+    """Test the Image element."""
     assert image_element.get_content() == image_element.base64
 
     assert image_element.get_metadata() == {
@@ -112,7 +121,8 @@ def test_image(image_element):
 
 @pytest.mark.parametrize("type", ["text", "image", "table"])
 @pytest.mark.parametrize("format", ["text", "html", "markdown", "image"])
-def test_image_error(type, format):
+def test_image_error(type: str, format: str) -> None:
+    """Test the error cases for the Image element."""
     if type == "image" and format == "image":
         Image(base64="base64_string", mime_type="image/jpeg", type=type, format=format)
     else:
@@ -130,7 +140,8 @@ def test_image_error(type, format):
         {"base64": "base64_string", "mime_type": "image/jpe"},
     ],
 )
-def test_image_error_2(kwargs):
+def test_image_error_2(kwargs: dict) -> None:
+    """Test the error cases for the Image element."""
     with pytest.raises(ValueError):
         Image(**kwargs)
 
@@ -150,11 +161,13 @@ def test_image_error_2(kwargs):
         },
     ]
 )
-def tabletext_element(request):
+def tabletext_element(request: FixtureRequest) -> TableText:
+    """Provides different configurations of TableText element."""
     return TableText(**request.param)
 
 
-def test_tabletext(tabletext_element):
+def test_tabletext(tabletext_element: TableText) -> None:
+    """Test the TableText element."""
     assert tabletext_element.get_content() == tabletext_element.text
 
     assert tabletext_element.get_metadata() == {
@@ -166,7 +179,8 @@ def test_tabletext(tabletext_element):
 
 @pytest.mark.parametrize("type", ["text", "image", "table"])
 @pytest.mark.parametrize("format", ["text", "html", "markdown", "image"])
-def test_tabletext_error(type, format):
+def test_tabletext_error(type: str, format: str) -> None:
+    """Test the error cases for the TableText element."""
     if type == "table" and format in ["text", "html", "markdown"]:
         TableText(text="Hello, World!", format=format, type=type)
     else:
@@ -183,7 +197,8 @@ def test_tabletext_error(type, format):
         {"text": "Hello, World!", "format": "htm"},
     ],
 )
-def test_tabletext_error_2(kwargs):
+def test_tabletext_error_2(kwargs: dict) -> None:
+    """Test the error cases for the TableText element."""
     with pytest.raises(ValueError):
         TableText(**kwargs)
 
@@ -229,11 +244,13 @@ def test_tabletext_error_2(kwargs):
         },
     ]
 )
-def tableimage_element(request):
+def tableimage_element(request: FixtureRequest) -> TableImage:
+    """Provides different configurations of TableImage element."""
     return TableImage(**request.param)
 
 
-def test_tableimage(tableimage_element):
+def test_tableimage(tableimage_element: TableImage) -> None:
+    """Test the TableImage element."""
     assert tableimage_element.get_content() == tableimage_element.base64
 
     assert tableimage_element.get_metadata() == {
@@ -246,7 +263,8 @@ def test_tableimage(tableimage_element):
 
 @pytest.mark.parametrize("type", ["text", "image", "table"])
 @pytest.mark.parametrize("format", ["text", "html", "markdown", "image"])
-def test_tableimage_error(type, format):
+def test_tableimage_error(type: str, format: str) -> None:
+    """Test the error cases for the TableImage element."""
     if type == "table" and format == "image":
         TableImage(
             base64="base64_string", mime_type="image/jpeg", type=type, format=format
@@ -266,7 +284,8 @@ def test_tableimage_error(type, format):
         {"base64": "base64_string", "mime_type": "image/jpe"},
     ],
 )
-def test_tableimage_error_2(kwargs):
+def test_tableimage_error_2(kwargs: dict) -> None:
+    """Test the error cases for the TableImage element."""
     with pytest.raises(ValueError):
         TableImage(**kwargs)
 
@@ -283,7 +302,8 @@ def test_tableimage_error_2(kwargs):
         lf("tableimage_element"),
     ],
 )
-def test_summary(element):
+def test_summary(element: Element) -> None:
+    """Test the summary of the elements."""
     with pytest.raises(ValueError):
         _ = element.get_summary()
 
@@ -292,11 +312,13 @@ def test_summary(element):
     assert element.get_summary() == "Summary"
 
 
-def test_element_abstract_class():
+def test_element_abstract_class() -> None:
+    """Test the abstract class Element."""
     with pytest.raises(TypeError):
         _ = Element(type="text", format="text")
 
 
-def test_table_abstract_class():
+def test_table_abstract_class() -> None:
+    """Test the abstract class Table."""
     with pytest.raises(TypeError):
         _ = Table(type="table", format="text")

@@ -49,6 +49,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.ruff]
 extend-include = ["*.ipynb"]
+target-version = "py310"
 
 [tool.ruff.lint]
 select = [
@@ -61,17 +62,30 @@ select = [
     "I",
     # pep8-naming
     "N",
+    # pydocstyle
+    "D",
     # pyupgrade
     "UP",
+    # annotations
+    "ANN",
     # flake8-bugbear
     "B",
     # flake8-comprehensions
     "C4",
+    # flake8-quotes
+    "Q",
+    # flake8-return
+    "RET",
     # flake8-simplify
     "SIM",
+    # flake8-unused-arguments
+    "ARG",
     # flake8-use-pathlib
     "PTH",
+    # pandas-vet
+    "PD",
 ]
+ignore = ["ANN101", "ANN102", "RET504"]
 
 [tool.ruff.lint.pep8-naming]
 # Allow Pydantic's `@validator` decorator to trigger class method treatment.

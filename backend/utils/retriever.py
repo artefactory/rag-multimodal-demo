@@ -1,67 +1,100 @@
+"""Utility functions for document retrievers."""
+
 import uuid
-from typing import Optional
+from collections.abc import Sequence
 
 from hydra.utils import instantiate
 from langchain.retrievers.multi_vector import MultiVectorRetriever
 from langchain_core.documents import Document
 from langchain_core.retrievers import BaseRetriever
+from omegaconf.dictconfig import DictConfig
 
 
-def get_retriever(config) -> BaseRetriever:
-    return instantiate(config.retriever)
+def get_retriever(config: DictConfig) -> BaseRetriever:
+    """Instantiate and return a BaseRetriever object based on the provided config.
+
+    Args:
+        config (DictConfig): Configuration object.
+
+    Raises:
+        ValueError: If the instantiated object is not a BaseRetriever.
+
+    Returns:
+        BaseRetriever: Instance of BaseRetriever.
+    """
+    object = instantiate(config.retriever)
+    if not isinstance(object, BaseRetriever):
+        raise ValueError(f"Expected a BaseRetriever object, got {type(object)}")
+    return object
 
 
-# Helper function to add documents to the vectorstore and docstore
 def add_documents_multivector(
     retriever: MultiVectorRetriever,
-    doc_summaries: list[str],
-    doc_contents: Optional[list[Document]] = None,
-    doc_contents_str: Optional[list[str]] = None,
-    doc_metadata: Optional[list[dict]] = None,
+    summary_list: list[str],
+    content_list: Sequence[str | Document],
+    metadata_list: list[dict] | None = None,
     id_key: str = "doc_id",
 ) -> None:
-    if doc_contents is None and doc_contents_str is None:
-        raise ValueError("Either doc_contents or doc_contents_str must be provided")
+    """Add documents to the vectorstore and docstore of a MultiVectorRetriever.
 
-    if doc_contents is not None and doc_contents_str is not None:
+    This function processes and adds document summaries to the retriever's vectorstore
+    and the corresponding raw content to the retriever's docstore.
+    The vectorstore is used to perform similarity searches, while the docstore holds
+    the raw content of the documents that will be passed to the model in the RAG chain.
+
+    Args:
+        retriever (MultiVectorRetriever): Retriever to add the documents to.
+        summary_list (list[str]): List of document summaries.
+        content_list (Sequence[str  |  Document]): List of document raw contents.
+        metadata_list (list[dict], optional): List of metadata dictionnaries associated
+            with each document. Defaults to None.
+        id_key (str, optional): Key used for the unique document ID in the metadata.
+            Defaults to "doc_id".
+
+    Raises:
+        ValueError: If the lengths of `summary_list`, `content_list` and `metadata_list`
+            do not match.
+        ValueError: If the retriever is not an instance of MultiVectorRetriever.
+    """
+    if len(summary_list) != len(content_list):
+        raise ValueError("The length of summary_list and content_list must be the same")
+    if metadata_list is not None and len(summary_list) != len(metadata_list):
         raise ValueError(
-            "Only one of doc_contents or doc_contents_str must be provided"
+            "The length of summary_list and metadata_list must be the same"
         )
 
     if not isinstance(retriever, MultiVectorRetriever):
         raise ValueError("retriever must be a MultiVectorRetriever")
 
-    doc_ids = [str(uuid.uuid4()) for _ in doc_summaries]
+    doc_ids = [str(uuid.uuid4()) for _ in summary_list]
 
-    # If doc_contents_str is provided, create Document objects from the strings
-    if doc_contents_str is not None:
-        doc_contents = [
-            Document(
-                page_content=s,
-                metadata={
-                    id_key: doc_ids[i],
-                    **(doc_metadata[i] if doc_metadata else {}),
-                },
-            )
-            for i, s in enumerate(doc_contents_str)
+    if metadata_list is None:
+        metadata_list = [{id_key: doc_ids[i]} for i in range(len(summary_list))]
+    else:
+        metadata_list = [
+            {id_key: doc_ids[i], **metadata_list[i]} for i in range(len(summary_list))
         ]
-
-    assert len(doc_summaries) == len(doc_contents) == len(doc_ids)
 
     # Create Document objects from the summaries
     summary_docs = [
         Document(
             page_content=s,
-            metadata={
-                id_key: doc_ids[i],
-                **(doc_metadata[i] if doc_metadata else {}),
-            },
+            metadata=metadata_list[i],
         )
-        for i, s in enumerate(doc_summaries)
+        for i, s in enumerate(summary_list)
     ]
 
-    # Add documents to the vectorstore and docstore
+    # Create Document objects from the raw content
+    content_docs = [
+        Document(
+            page_content=c if isinstance(c, str) else c.page_content,
+            metadata=metadata_list[i],
+        )
+        for i, c in enumerate(content_list)
+    ]
+
+    # Add summaries to the vectorstore and contents to the docstore
     retriever.vectorstore.add_documents(summary_docs)
-    retriever.docstore.mset(list(zip(doc_ids, doc_contents)))
+    retriever.docstore.mset(list(zip(doc_ids, content_docs, strict=False)))
 
     return

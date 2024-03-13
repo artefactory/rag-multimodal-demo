@@ -1,3 +1,5 @@
+"""Prompts for RAG Option 3."""
+
 TEXT_SUMMARIZATION_PROMPT = """You are an assistant tasked with summarizing text for \
 retrieval. These summaries will be embedded and used to retrieve the raw text \
 elements. Give a concise summary of the text that is well optimized for retrieval.

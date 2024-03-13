@@ -1,4 +1,6 @@
-from typing import Literal, Optional
+"""Configuration schema for the RAG Option 1."""
+
+from typing import Literal
 
 from omegaconf import OmegaConf
 from omegaconf.dictconfig import DictConfig
@@ -7,16 +9,22 @@ from pydantic.dataclasses import dataclass
 
 
 class HydraObject(BaseModel):
+    """Configuration for objects to be instantiated by Hydra."""
+
     target: str
-    partial: Optional[bool]
+    partial: bool | None
 
     class Config:
+        """Pydantic configuration."""
+
         extra = "allow"
         fields = {"target": "_target_", "partial": "_partial_"}
 
 
 @dataclass(config=ConfigDict(extra="forbid"))
 class PathConfig:
+    """Configuration for paths."""
+
     docs: str
     database: str
     export_extracted: str
@@ -24,6 +32,8 @@ class PathConfig:
 
 @dataclass(config=ConfigDict(extra="forbid"))
 class IngestConfig:
+    """Configuration for PDF ingestion."""
+
     chunking_enable: bool
     chunking_func: HydraObject
 
@@ -36,6 +46,8 @@ class IngestConfig:
 
 @dataclass(config=ConfigDict(extra="forbid"))
 class Config:
+    """Configuration for the RAG Option 1."""
+
     name: str
 
     path: PathConfig
@@ -49,6 +61,14 @@ class Config:
 
 
 def validate_config(config: DictConfig) -> Config:
+    """Validate the configuration.
+
+    Args:
+        config (DictConfig): Configuration object.
+
+    Returns:
+        Config: Validated configuration object.
+    """
     # Resolve the DictConfig to a native Python object
     cfg_obj = OmegaConf.to_object(config)
     # Instantiate the Config class

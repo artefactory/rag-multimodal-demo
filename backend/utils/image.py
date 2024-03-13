@@ -1,16 +1,23 @@
+"""Utility functions for image processing."""
+
 import base64
 import io
 
 from PIL import Image
 
 
-def resize_base64_image(base64_string, max_size=(2000, 768)):
-    """
-    Resize an image encoded as a Base64 string
+def resize_base64_image(
+    base64_string: str, max_size: tuple[int, int] = (2000, 768)
+) -> str:
+    """Resize an image encoded as a Base64 string.
 
-    :param base64_string: Base64 string
-    :param size: Image size
-    :return: Re-sized Base64 string
+    Args:
+        base64_string (str): Base64 string.
+        max_size (tuple[int, int], optional): Maximum size of the image in the format
+            (width, height). Defaults to (2000, 768).
+
+    Returns:
+        str: Re-sized Base64 string.
     """
     # Decode the Base64 string
     img_data = base64.b64decode(base64_string)

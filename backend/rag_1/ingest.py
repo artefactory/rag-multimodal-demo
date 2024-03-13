@@ -1,3 +1,5 @@
+"""Ingest PDF files into the vectorstore for RAG Option 1."""
+
 import shutil
 from pathlib import Path
 
@@ -16,7 +18,13 @@ from backend.utils.unstructured import (
 from backend.utils.vectorstore import get_vectorstore
 
 
-def ingest_pdf(file_path, config):
+def ingest_pdf(file_path: str | Path, config: DictConfig) -> None:
+    """Ingest a PDF file.
+
+    Args:
+        file_path (str | Path): Path to the PDF file.
+        config (DictConfig): Configuration object.
+    """
     # Get elements
     raw_pdf_elements = partition_pdf(
         filename=file_path,
@@ -98,7 +106,12 @@ def ingest_pdf(file_path, config):
 
 
 @hydra.main(config_path=".", config_name="config", version_base=None)
-def main(config: DictConfig):
+def main(config: DictConfig) -> None:
+    """Ingest all PDF files in the docs folder.
+
+    Args:
+        config (DictConfig): Configuration object.
+    """
     # Validate config
     _ = validate_config(config)
 
