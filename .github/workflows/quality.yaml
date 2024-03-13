@@ -1,0 +1,27 @@
+name: Code quality
+
+on: [push, pull_request]
+
+jobs:
+  code-quality:
+    name: Launching code quality
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Install Poetry
+        run: pipx install poetry
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          cache: 'poetry'
+
+      - name: Install requirements
+        run: poetry install --with dev --no-interaction
+
+      - name: Run pre-commit
+        run: poetry run pre-commit run --all --show-diff-on-failure

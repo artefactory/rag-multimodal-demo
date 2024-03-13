@@ -1,5 +1,12 @@
 # RAG Multimodal Demo <!-- omit from toc -->
 
+[![CI status](https://github.com/artefactory/rag-multimodal-demo/actions/workflows/ci.yaml/badge.svg)](https://github.com/artefactory/rag-multimodal-demo/actions/workflows/ci.yaml?query=branch%3Amain)
+[![Code quality status](https://github.com/artefactory/rag-multimodal-demo/actions/workflows/quality.yaml/badge.svg)](https://github.com/artefactory/rag-multimodal-demo/actions/workflows/quality.yaml?query=branch%3Amain)
+![Python Version](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%20-blue.svg)
+
+[![Linting , formatting, imports sorting: ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+[![Pre-commit](https://img.shields.io/badge/pre--commit-enabled-informational?logo=pre-commit&logoColor=white)](https://github.com/artefactory/rag-multimodal-demo/blob/main/.pre-commit-config.yaml)
+
 - [Features](#features)
   - [RAG Option 1](#rag-option-1)
   - [RAG Option 3](#rag-option-3)
