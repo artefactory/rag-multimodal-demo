@@ -25,6 +25,20 @@ including text, images, and tables. It utilizes a retriever to store and manage 
 
 ![alt text](https://blog.langchain.dev/content/images/size/w1600/2023/10/image-22.png)
 
+- **Option 1**: This option involves retrieving the raw image directly from the dataset and combining it with the raw table and text data. The combined raw data is then processed by a Multimodal LLM to generate an answer. This approach uses the complete, unprocessed image data in conjunction with textual information.
+  - Ingestion : Multimodal embeddings
+  - RAG chain : Multimodal LLM
+
+- **Option 2**: In this option, instead of using the raw image, an image summary is retrieved. This summary, along with the raw table and text data, is fed into a Text LLM to generate an answer.
+  - Ingestion : Multimodal LLM (for summarization) + Text embeddings
+  - RAG chain : Text LLM
+
+- **Option 3**: This option also retrieves an image summary, but unlike Option 2, it passes the raw image to a Multimodal LLM for synthesis along with the raw table and text data.
+  - Ingestion : Multimodal LLM (for summarization) + Text embeddings
+  - RAG chain : Multimodal LLM
+
+For all options, we can choose to treat tables as text or images.
+
 ### RAG Option 1
 
 Folder: [backend/rag_1](backend/rag_1)
@@ -119,8 +133,8 @@ make serve
 This command will launch the backend server, allowing you to access the FastAPI documentation and playground interfaces :
 
 - FastAPI documentation: <http://0.0.0.0:8000/docs>
-- RAG 1 playground interface: <http://0.0.0.0:8000/rag-1/playground/>
-- RAG 3 playground interface: <http://0.0.0.0:8000/rag-3/playground/>
+- RAG Option 1 playground interface: <http://0.0.0.0:8000/rag-1/playground/>
+- RAG Option 3 playground interface: <http://0.0.0.0:8000/rag-3/playground/>
 
 ## Development
 
