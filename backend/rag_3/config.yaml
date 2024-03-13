@@ -47,6 +47,8 @@ retriever:
   id_key: "doc_id"
 
 ingest:
+  clear_database: True
+
   chunking_enable: True
   chunking_func:
     _target_: unstructured.chunking.title.chunk_by_title

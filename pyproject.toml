@@ -89,7 +89,7 @@ ignore = ["ANN101", "ANN102", "RET504"]
 
 [tool.ruff.lint.pep8-naming]
 # Allow Pydantic's `@validator` decorator to trigger class method treatment.
-classmethod-decorators = ["classmethod", "pydantic.root_validator"]
+classmethod-decorators = ["classmethod", "pydantic.validator", "pydantic.root_validator"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"

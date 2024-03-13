@@ -31,6 +31,8 @@ retriever:
   search_type: "similarity"
 
 ingest:
+  clear_database: True
+
   chunking_enable: True
   chunking_func:
     _target_: unstructured.chunking.title.chunk_by_title

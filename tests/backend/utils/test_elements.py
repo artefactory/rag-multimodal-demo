@@ -55,6 +55,7 @@ def test_text_error(type: str, format: str) -> None:
         {"text": "Hello, World!"},
         {"text": "Hello, World!", "type": "text"},
         {"text": "Hello, World!", "format": "htm"},
+        {"text": "", "format": "text"},
     ],
 )
 def test_text_error_2(kwargs: dict) -> None:
@@ -138,6 +139,7 @@ def test_image_error(type: str, format: str) -> None:
         {"mime_type": "image/jpeg"},
         {"base64": "base64_string"},
         {"base64": "base64_string", "mime_type": "image/jpe"},
+        {"base64": "", "mime_type": "image/jpeg"},
     ],
 )
 def test_image_error_2(kwargs: dict) -> None:
@@ -195,6 +197,7 @@ def test_tabletext_error(type: str, format: str) -> None:
         {"text": "Hello, World!"},
         {"text": "Hello, World!", "type": "table"},
         {"text": "Hello, World!", "format": "htm"},
+        {"text": "", "format": "html"},
     ],
 )
 def test_tabletext_error_2(kwargs: dict) -> None:
@@ -282,6 +285,7 @@ def test_tableimage_error(type: str, format: str) -> None:
         {"mime_type": "image/jpeg"},
         {"base64": "base64_string"},
         {"base64": "base64_string", "mime_type": "image/jpe"},
+        {"base64": "", "mime_type": "image/jpeg"},
     ],
 )
 def test_tableimage_error_2(kwargs: dict) -> None:
@@ -310,6 +314,9 @@ def test_summary(element: Element) -> None:
     element.set_summary("Summary")
 
     assert element.get_summary() == "Summary"
+
+    with pytest.raises(ValueError):
+        element.set_summary("")
 
 
 def test_element_abstract_class() -> None:
