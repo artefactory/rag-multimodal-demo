@@ -9,6 +9,7 @@
 
 - [Features](#features)
   - [RAG Option 1](#rag-option-1)
+  - [RAG Option 2](#rag-option-2)
   - [RAG Option 3](#rag-option-3)
 - [Installation](#installation)
 - [Usage](#usage)
@@ -62,6 +63,36 @@ Parameters:
 - `ingest.table_format` : How to extract table with Unstructured (`text`, `html` or `image`).
 - `ingest.export_extracted` : Whether to export extracted elements in local folder.
 
+### RAG Option 2
+
+Folder: [backend/rag_2](backend/rag_2)
+
+Method:
+
+- Use a multimodal LLM (such as GPT-4V, LLaVA, or FUYU-8b) to produce text summaries from images.
+- Embed and retrieve image summaries and texts chunks.
+- Pass image summaries and text chunks to a text LLM for answer synthesis.
+
+Backend:
+
+- Use the [multi-vector retriever](https://python.langchain.com/docs/modules/data_connection/retrievers/multi_vector)
+  with [Chroma](https://www.trychroma.com/) to store raw text (or tables) and images (in a docstore) along with their summaries (in a vectorstore) for retrieval.
+- Use GPT-4V for image summarization.
+- Use GPT-4 for final answer synthesis from join review of image summaries and texts (or tables).
+
+Parameters:
+
+- `ingest.clear_database` : Whether to clear the database before ingesting new data.
+- `ingest.metadata_keys` : Unstructured metadata to use.
+- `ingest.table_format` : How to extract tables with Unstructured (`text`, `html` or `image`).
+- `ingest.summarize_text` : Whether to summarize texts with an LLM or use raw texts for retrieval.
+- `ingest.summarize_table` : Whether to summarize tables with LLM or use raw tables for retrieval.
+- `ingest.vectorstore_source` : The field of documents to add into the vectorstore (`content` or `summary`).
+- `ingest.docstore_source` : The field of documents to add into the docstore (`content` or `summary`).
+- `ingest.export_extracted` : Whether to export extracted elements to a local folder.
+
+In option 2, the vectorstore and docstore must be populated with text documents (text content or summary).
+
 ### RAG Option 3
 
 Folder: [backend/rag_3](backend/rag_3)
@@ -75,7 +106,7 @@ Method:
 Backend:
 
 - Use the [multi-vector retriever](https://python.langchain.com/docs/modules/data_connection/retrievers/multi_vector)
-  with [Chroma](https://www.trychroma.com/) to store raw text and images (in a docstore) along with their summaries (in a vectorstore) for retrieval.
+  with [Chroma](https://www.trychroma.com/) to store raw text (or tables) and images (in a docstore) along with their summaries (in a vectorstore) for retrieval.
 - Use GPT-4V for both image summarization (for retrieval) as well as final answer synthesis from join review of images and texts (or tables).
 
 Parameters:
@@ -88,6 +119,8 @@ Parameters:
 - `ingest.vectorstore_source` : The field of documents to add into the vectorstore (`content` or `summary`).
 - `ingest.docstore_source` : The field of documents to add into the docstore (`content` or `summary`).
 - `ingest.export_extracted` : Whether to export extracted elements to a local folder.
+
+In option 3, the vectorstore must be populated with text documents (text content or summary) as in option 2. However, the docstore can be populated with either text or image documents.
 
 ## Installation
 
@@ -117,6 +150,12 @@ To use the RAG Multimodal Demo, follow these steps:
     make ingest_rag_1
     ```
 
+    For RAG Option 2:
+
+    ```bash
+    make ingest_rag_2
+    ```
+
     For RAG Option 3:
 
     ```bash
@@ -136,6 +175,7 @@ This command will launch the backend server, allowing you to access the FastAPI 
 
 - FastAPI documentation: <http://0.0.0.0:8000/docs>
 - RAG Option 1 playground interface: <http://0.0.0.0:8000/rag-1/playground/>
+- RAG Option 2 playground interface: <http://0.0.0.0:8000/rag-2/playground/>
 - RAG Option 3 playground interface: <http://0.0.0.0:8000/rag-3/playground/>
 
 ## Development
