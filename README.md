@@ -58,9 +58,9 @@ Backend:
 Parameters:
 
 - `ingest.clear_database` : Whether to clear the database before ingesting new data.
+- `ingest.metadata_keys` : Unstructured metadata to use.
 - `ingest.table_format` : How to extract table with Unstructured (`text`, `html` or `image`).
 - `ingest.export_extracted` : Whether to export extracted elements in local folder.
-- `metadata_keys` : Unstructured metadata to use.
 
 ### RAG Option 3
 
@@ -75,17 +75,19 @@ Method:
 Backend:
 
 - Use the [multi-vector retriever](https://python.langchain.com/docs/modules/data_connection/retrievers/multi_vector)
-  with [Chroma](https://www.trychroma.com/) to store raw text and images along with their summaries for retrieval.
+  with [Chroma](https://www.trychroma.com/) to store raw text and images (in a docstore) along with their summaries (in a vectorstore) for retrieval.
 - Use GPT-4V for both image summarization (for retrieval) as well as final answer synthesis from join review of images and texts (or tables).
 
 Parameters:
 
 - `ingest.clear_database` : Whether to clear the database before ingesting new data.
+- `ingest.metadata_keys` : Unstructured metadata to use.
 - `ingest.table_format` : How to extract tables with Unstructured (`text`, `html` or `image`).
 - `ingest.summarize_text` : Whether to summarize texts with an LLM or use raw texts for retrieval.
 - `ingest.summarize_table` : Whether to summarize tables with LLM or use raw tables for retrieval.
+- `ingest.vectorstore_source` : The field of documents to add into the vectorstore (`content` or `summary`).
+- `ingest.docstore_source` : The field of documents to add into the docstore (`content` or `summary`).
 - `ingest.export_extracted` : Whether to export extracted elements to a local folder.
-- `metadata_keys` : Metadata keys from Unstructured to use.
 
 ## Installation
 
