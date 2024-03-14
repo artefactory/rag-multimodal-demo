@@ -313,7 +313,7 @@ class TableImage(Table, Image):
     format: Literal["image"] = "image"
 
 
-def _create_text_element(doc: Document, element_class: type[Text]) -> Element:
+def _create_text_element(doc: Document, element_class: type[Text]) -> Text:
     """Create a text element from a Langchain Document object.
 
     Args:
@@ -323,7 +323,8 @@ def _create_text_element(doc: Document, element_class: type[Text]) -> Element:
     Returns:
         Element: Text element created from the Document object.
     """
-    match doc.metadata["source"]:
+    source = doc.metadata.get("source", "content")
+    match source:
         case "content":
             element = element_class(
                 type=doc.metadata["type"],
@@ -347,7 +348,7 @@ def _create_text_element(doc: Document, element_class: type[Text]) -> Element:
 NO_IMAGE = local_image_to_base64("img/no_image.png")
 
 
-def _create_image_element(doc: Document, element_class: type[Image]) -> Element:
+def _create_image_element(doc: Document, element_class: type[Image]) -> Image:
     """Create an image element from a Langchain Document object.
 
     Args:
@@ -357,7 +358,8 @@ def _create_image_element(doc: Document, element_class: type[Image]) -> Element:
     Returns:
         Element: Image element created from the Document object.
     """
-    match doc.metadata["source"]:
+    source = doc.metadata.get("source", "content")
+    match source:
         case "content":
             element = element_class(
                 type=doc.metadata["type"],
