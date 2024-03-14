@@ -39,20 +39,21 @@ async def apply_summarize_text(text_list: list[Text], config: DictConfig) -> Non
         text_list (list[Text]): List of Text elements.
         config (DictConfig): Configuration object.
     """
-    str_list = [text.text for text in text_list]
-
     if config.ingest.summarize_text:
+        str_list = [text.text for text in text_list]
+
         model = get_text_llm(config)
 
         text_summaries = await generate_text_summaries(
             str_list, prompt_template=prompts.TEXT_SUMMARIZATION_PROMPT, model=model
         )
 
-    else:
-        text_summaries = str_list
+        for text in text_list:
+            text.set_summary(text_summaries.pop(0))
 
-    for text in text_list:
-        text.set_summary(text_summaries.pop(0))
+    else:
+        logger.info("Skipping text summarization")
+
     return
 
 
@@ -69,11 +70,11 @@ async def apply_summarize_table(table_list: list[Table], config: DictConfig) -> 
         ValueError: If the table format is "image" and summarize_table is False.
         ValueError: If the table format is invalid.
     """
-    table_format = config.ingest.table_format
-    if table_format in ["text", "html"]:
-        str_list = [table.text for table in table_list]
+    if config.ingest.summarize_table:
+        table_format = config.ingest.table_format
+        if table_format in ["text", "html"]:
+            str_list = [table.text for table in table_list]
 
-        if config.ingest.summarize_table:
             model = get_text_llm(config)
 
             table_summaries = await generate_text_summaries(
@@ -81,26 +82,25 @@ async def apply_summarize_table(table_list: list[Table], config: DictConfig) -> 
                 prompt_template=prompts.TABLE_SUMMARIZATION_PROMPT,
                 model=model,
             )
+        elif config.ingest.table_format == "image":
+            img_base64_list = [table.base64 for table in table_list]
+            img_mime_type_list = [table.mime_type for table in table_list]
+            model = get_vision_llm(config)
+
+            table_summaries = await generate_image_summaries(
+                img_base64_list,
+                img_mime_type_list,
+                prompt=prompts.TABLE_SUMMARIZATION_PROMPT,
+                model=model,
+            )
         else:
-            table_summaries = str_list
-    elif config.ingest.table_format == "image":
-        if not config.ingest.summarize_table:
-            raise ValueError("summarize_table must be True for table_format=image")
-        img_base64_list = [table.base64 for table in table_list]
-        img_mime_type_list = [table.mime_type for table in table_list]
-        model = get_vision_llm(config)
+            raise ValueError(f"Invalid table format: {table_format}")
 
-        table_summaries = await generate_image_summaries(
-            img_base64_list,
-            img_mime_type_list,
-            prompt=prompts.TABLE_SUMMARIZATION_PROMPT,
-            model=model,
-        )
+        for table in table_list:
+            table.set_summary(table_summaries.pop(0))
+
     else:
-        raise ValueError(f"Invalid table format: {table_format}")
-
-    for table in table_list:
-        table.set_summary(table_summaries.pop(0))
+        logger.info("Skipping table summarization")
 
     return
 
