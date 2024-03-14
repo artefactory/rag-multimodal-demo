@@ -30,9 +30,11 @@ def get_retriever(config: DictConfig) -> BaseRetriever:
 
 def add_documents_multivector(
     retriever: MultiVectorRetriever,
-    summary_list: list[str],
-    content_list: Sequence[str | Document],
+    vectorstore_content: list[str],
+    docstore_content: Sequence[str | Document],
     metadata_list: list[dict] | None = None,
+    vectorstore_source: str = "summary",
+    docstore_source: str = "content",
     id_key: str = "doc_id",
 ) -> None:
     """Add documents to the vectorstore and docstore of a MultiVectorRetriever.
@@ -44,57 +46,66 @@ def add_documents_multivector(
 
     Args:
         retriever (MultiVectorRetriever): Retriever to add the documents to.
-        summary_list (list[str]): List of document summaries.
-        content_list (Sequence[str  |  Document]): List of document raw contents.
+        vectorstore_content (list[str]): List of documents to add to the
+            vectorstore (usually the summaries).
+        docstore_content (Sequence[str  |  Document]): List of documents to add to
+            the docstore (usually the raw content).
         metadata_list (list[dict], optional): List of metadata dictionnaries associated
             with each document. Defaults to None.
+        vectorstore_source (str, optional): Source name for the vectorstore. Defaults to
+            "summary".
+        docstore_source (str, optional): Source name for the docstore. Defaults to
+            "content".
         id_key (str, optional): Key used for the unique document ID in the metadata.
             Defaults to "doc_id".
 
     Raises:
-        ValueError: If the lengths of `summary_list`, `content_list` and `metadata_list`
-            do not match.
+        ValueError: If the lengths of `vectorstore_content`, `docstore_content` and
+            `metadata_list` do not match.
         ValueError: If the retriever is not an instance of MultiVectorRetriever.
     """
-    if len(summary_list) != len(content_list):
-        raise ValueError("The length of summary_list and content_list must be the same")
-    if metadata_list is not None and len(summary_list) != len(metadata_list):
+    if len(vectorstore_content) != len(docstore_content):
         raise ValueError(
-            "The length of summary_list and metadata_list must be the same"
+            "The length of vectorstore_content and docstore_content must be the same"
+        )
+    if metadata_list is not None and len(vectorstore_content) != len(metadata_list):
+        raise ValueError(
+            "The length of vectorstore_content and metadata_list must be the same"
         )
 
     if not isinstance(retriever, MultiVectorRetriever):
         raise ValueError("retriever must be a MultiVectorRetriever")
 
-    doc_ids = [str(uuid.uuid4()) for _ in summary_list]
+    doc_ids = [str(uuid.uuid4()) for _ in vectorstore_content]
 
     if metadata_list is None:
-        metadata_list = [{id_key: doc_ids[i]} for i in range(len(summary_list))]
+        metadata_list = [{id_key: doc_ids[i]} for i in range(len(vectorstore_content))]
     else:
         metadata_list = [
-            {id_key: doc_ids[i], **metadata_list[i]} for i in range(len(summary_list))
+            {id_key: doc_ids[i], **metadata_list[i]}
+            for i in range(len(vectorstore_content))
         ]
 
     # Create Document objects from the summaries
-    summary_docs = [
+    vectorstore_docs = [
         Document(
             page_content=s,
-            metadata=metadata_list[i],
+            metadata={**metadata_list[i], "source": vectorstore_source},
         )
-        for i, s in enumerate(summary_list)
+        for i, s in enumerate(vectorstore_content)
     ]
 
     # Create Document objects from the raw content
-    content_docs = [
+    docstore_docs = [
         Document(
             page_content=c if isinstance(c, str) else c.page_content,
-            metadata=metadata_list[i],
+            metadata={**metadata_list[i], "source": docstore_source},
         )
-        for i, c in enumerate(content_list)
+        for i, c in enumerate(docstore_content)
     ]
 
     # Add summaries to the vectorstore and contents to the docstore
-    retriever.vectorstore.add_documents(summary_docs)
-    retriever.docstore.mset(list(zip(doc_ids, content_docs, strict=False)))
+    retriever.vectorstore.add_documents(vectorstore_docs)
+    retriever.docstore.mset(list(zip(doc_ids, docstore_docs, strict=False)))
 
     return

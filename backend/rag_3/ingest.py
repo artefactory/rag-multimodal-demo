@@ -13,8 +13,9 @@ from unstructured.partition.pdf import partition_pdf
 from backend.rag_3 import prompts
 from backend.rag_3.config import validate_config
 from backend.utils.elements import Image, Table, Text
+from backend.utils.ingest import add_elements_to_multivector_retriever
 from backend.utils.llm import get_text_llm, get_vision_llm
-from backend.utils.retriever import add_documents_multivector, get_retriever
+from backend.utils.retriever import get_retriever
 from backend.utils.summarization import (
     generate_image_summaries,
     generate_text_summaries,
@@ -176,39 +177,30 @@ async def ingest_pdf(file_path: str | Path, config: DictConfig) -> None:
     retriever = get_retriever(config)
 
     # Add texts to retriever
-    text_summaries = [text.get_summary() for text in texts]
-    text_contents = [text.get_content() for text in texts]
-    text_metadata = [text.get_metadata() for text in texts]
-
-    add_documents_multivector(
+    logger.info("Adding texts to retriever")
+    add_elements_to_multivector_retriever(
+        elements=texts,
         retriever=retriever,
-        summary_list=text_summaries,
-        content_list=text_contents,
-        metadata_list=text_metadata,
+        vectorstore_source=config.ingest.vectorstore_source.text,
+        docstore_source=config.ingest.docstore_source.text,
     )
 
     # Add tables to retriever
-    table_summaries = [table.get_summary() for table in tables]
-    table_contents = [table.get_content() for table in tables]
-    table_metadata = [table.get_metadata() for table in tables]
-
-    add_documents_multivector(
+    logger.info("Adding tables to retriever")
+    add_elements_to_multivector_retriever(
+        elements=tables,
         retriever=retriever,
-        summary_list=table_summaries,
-        content_list=table_contents,
-        metadata_list=table_metadata,
+        vectorstore_source=config.ingest.vectorstore_source.table,
+        docstore_source=config.ingest.docstore_source.table,
     )
 
     # Add images to retriever
-    image_summaries = [image.get_summary() for image in images]
-    image_contents = [image.get_content() for image in images]
-    image_metadata = [image.get_metadata() for image in images]
-
-    add_documents_multivector(
+    logger.info("Adding images to retriever")
+    add_elements_to_multivector_retriever(
+        elements=images,
         retriever=retriever,
-        summary_list=image_summaries,
-        content_list=image_contents,
-        metadata_list=image_metadata,
+        vectorstore_source=config.ingest.vectorstore_source.image,
+        docstore_source=config.ingest.docstore_source.image,
     )
 
     # Export extracted elements

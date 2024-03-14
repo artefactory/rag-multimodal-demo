@@ -10,6 +10,8 @@ from IPython.display import HTML, Markdown, display
 from langchain_core.documents import Document
 from pydantic import BaseModel, PrivateAttr, validator
 
+from .image import local_image_to_base64
+
 
 class Element(BaseModel):
     """Abstract base class representing an element with a type, format, and metadata.
@@ -311,6 +313,75 @@ class TableImage(Table, Image):
     format: Literal["image"] = "image"
 
 
+def _create_text_element(doc: Document, element_class: type[Text]) -> Text:
+    """Create a text element from a Langchain Document object.
+
+    Args:
+        doc (Document): Langchain Document object.
+        element_class (Type[Text]): Text element class to create (Text, TableText).
+
+    Returns:
+        Element: Text element created from the Document object.
+    """
+    source = doc.metadata.get("source", "content")
+    match source:
+        case "content":
+            element = element_class(
+                type=doc.metadata["type"],
+                format=doc.metadata["format"],
+                text=doc.page_content,
+                metadata=doc.metadata,
+            )
+        case "summary":
+            element = element_class(
+                type=doc.metadata["type"],
+                format=doc.metadata["format"],
+                text="No content available",
+                metadata=doc.metadata,
+            )
+            element.set_summary(doc.page_content)
+        case other:
+            raise ValueError(f"Unsupported element source: {other}")
+    return element
+
+
+NO_IMAGE = local_image_to_base64("img/no_image.png")
+
+
+def _create_image_element(doc: Document, element_class: type[Image]) -> Image:
+    """Create an image element from a Langchain Document object.
+
+    Args:
+        doc (Document): Langchain Document object.
+        element_class (Type[Image]): Image element class to create (Image, TableImage).
+
+    Returns:
+        Element: Image element created from the Document object.
+    """
+    source = doc.metadata.get("source", "content")
+    match source:
+        case "content":
+            element = element_class(
+                type=doc.metadata["type"],
+                format=doc.metadata["format"],
+                base64=doc.page_content,
+                mime_type=doc.metadata["mime_type"],
+                metadata=doc.metadata,
+            )
+        case "summary":
+            element = element_class(
+                type=doc.metadata["type"],
+                format=doc.metadata["format"],
+                base64=NO_IMAGE,
+                mime_type="image/png",
+                metadata=doc.metadata,
+            )
+            element.set_summary(doc.page_content)
+        case other:
+            raise ValueError(f"Unsupported element source: {other}")
+    return element
+
+
 def convert_documents_to_elements(docs: list[Document]) -> list:
     """Convert a list of Langchain Document objects to a list of Element objects.
 
@@ -327,37 +398,19 @@ def convert_documents_to_elements(docs: list[Document]) -> list:
     for doc in docs:
         match doc.metadata["type"]:
             case "text":
-                text_format = doc.metadata["format"]
-                element = Text(
-                    text=doc.page_content, format=text_format, metadata=doc.metadata
-                )
+                element = _create_text_element(doc, Text)
             case "image":
-                element = Image(
-                    base64=doc.page_content,
-                    mime_type=doc.metadata["mime_type"],
-                    metadata=doc.metadata,
-                )
-
+                element = _create_image_element(doc, Image)
             case "table":
-                table_format = doc.metadata["format"]
-                match table_format:
+                match doc.metadata["format"]:
                     case "text" | "html" | "markdown":
-                        element = TableText(
-                            text=doc.page_content,
-                            format=table_format,
-                            metadata=doc.metadata,
-                        )
-
+                        element = _create_text_element(doc, TableText)
                     case "image":
-                        element = TableImage(
-                            base64=doc.page_content,
-                            mime_type=doc.metadata["mime_type"],
-                            metadata=doc.metadata,
-                        )
+                        element = _create_image_element(doc, TableImage)
                     case other:
                         raise ValueError(f"Unsupported table format: {other}")
             case other:
-                raise ValueError(f"Unsupported document type: {other['type']}")
+                raise ValueError(f"Unsupported document type: {other}")
         elements.append(element)
 
     return elements

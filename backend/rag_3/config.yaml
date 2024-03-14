@@ -57,12 +57,21 @@ ingest:
     new_after_n_chars: 3800
     combine_text_under_n_chars: 2000
 
-  table_format: "image" # "text" or "html" or "image"
-  summarize_text: False
-  summarize_table: True
-
-  export_extracted: True
-
   metadata_keys:
     - filename
     - page_number
+  table_format: "image" # "text" or "html" or "image"
+
+  summarize_text: False
+  summarize_table: True
+
+  vectorstore_source: # retrieval step
+    text: "content"
+    table: "summary"
+    image: "summary"
+  docstore_source: # RAG step
+    text: "content"
+    table: "content"
+    image: "content"
+
+  export_extracted: True

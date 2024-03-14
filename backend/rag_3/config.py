@@ -31,6 +31,15 @@ class PathConfig:
 
 
 @dataclass(config=ConfigDict(extra="forbid"))
+class SourceConfig:
+    """Configuration for the vectorstore or docstore source."""
+
+    text: Literal["content", "summary"]
+    table: Literal["content", "summary"]
+    image: Literal["content", "summary"]
+
+
+@dataclass(config=ConfigDict(extra="forbid"))
 class IngestConfig:
     """Configuration for PDF ingestion."""
 
@@ -39,36 +48,63 @@ class IngestConfig:
     chunking_enable: bool
     chunking_func: HydraObject
 
+    metadata_keys: list[str]
     table_format: Literal["text", "html", "image"]
+
     summarize_text: bool
     summarize_table: bool
 
-    metadata_keys: list[str]
+    vectorstore_source: SourceConfig
+    docstore_source: SourceConfig
 
     export_extracted: bool
 
-    @root_validator(pre=False)
-    def validate_table_format(cls, values: dict) -> dict:
-        """Validate the 'table_format' field in relation to 'summarize_table'.
-
-        This validator ensures that if the 'table_format' is set to 'image',
-        then 'summarize_table' must also be set to True. It enforces the rule
-        that image tables require summarization.
+    @root_validator(pre=True)
+    def validate_fields(cls, values: dict) -> dict:
+        """Various checks on the fields.
 
         Args:
-            values (dict): Dictionnary of field values for the IngestConfig class.
-
-        Raises:
-            ValueError: If 'table_format' is 'image' and 'summarize_table' is not True.
+            values (dict): Field values.
 
         Returns:
-            dict: The validated field values.
+            dict: Validated field values.
         """
-        table_format = values.get("table_format")
-        summarize_table = values.get("summarize_table")
+        table_format = values["table_format"]
+        summarize_text = values["summarize_text"]
+        summarize_table = values["summarize_table"]
+        vectorstore_source = values["vectorstore_source"]
+        docstore_source = values["docstore_source"]
 
-        if table_format == "image" and not summarize_table:
-            raise ValueError("summarize_table must be True for table_format=image")
+        # Check that summary is enabled when the source is set to "summary"
+        if vectorstore_source["text"] == "summary" and not summarize_text:
+            raise ValueError(
+                "vectorstore_source.text cannot be 'summary' when summarize_text is"
+                " False"
+            )
+        if vectorstore_source["table"] == "summary" and not summarize_table:
+            raise ValueError(
+                "vectorstore_source.table cannot be 'summary' when summarize_table is"
+                " False"
+            )
+        if docstore_source["text"] == "summary" and not summarize_text:
+            raise ValueError(
+                "docstore_source.text cannot be 'summary' when summarize_text is False"
+            )
+        if docstore_source["table"] == "summary" and not summarize_table:
+            raise ValueError(
+                "docstore_source.table cannot be 'summary' when summarize_table is"
+                " False"
+            )
+
+        # Check that the source of vectorstore is not set to "content" when the content
+        # is an image
+        if vectorstore_source["image"] == "content":
+            raise ValueError("vectorstore_source.image cannot be 'content'")
+        if table_format == "image" and vectorstore_source["table"] == "content":
+            raise ValueError(
+                "vectorstore_source.table cannot be 'content' when table_format is"
+                " 'image'"
+            )
 
         return values
 
