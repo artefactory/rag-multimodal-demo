@@ -74,15 +74,6 @@ def ingest_pdf(file_path: str | Path, config: DictConfig) -> None:
         metadatas=table_metadata,
     )
 
-    # Add tables to vectorstore
-    table_contents = [table.get_content() for table in tables]
-    table_metadata = [table.get_metadata() for table in tables]
-
-    vectorstore.add_texts(
-        texts=table_contents,
-        metadatas=table_metadata,
-    )
-
     # Add images to retriever
     image_path = [image.get_local_path() for image in images]
     image_metadata = [image.get_metadata() for image in images]
