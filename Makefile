@@ -9,3 +9,6 @@ ingest_rag_3:
 
 serve:
 	poetry run python -m app.server
+
+launch_frontend:
+	poetry run python -m streamlit run frontend/front.py
