@@ -4,7 +4,7 @@ from typing import Literal
 
 from omegaconf import OmegaConf
 from omegaconf.dictconfig import DictConfig
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, validator
 from pydantic.dataclasses import dataclass
 
 
@@ -41,8 +41,19 @@ class IngestConfig:
 
     metadata_keys: list[str]
     table_format: Literal["text", "html", "image"]
+    image_min_size: list[float]
+    table_min_size: list[float]
 
     export_extracted: bool
+
+    @validator("image_min_size", "table_min_size")
+    def validate_size(cls, value: list[float]) -> list[float]:
+        """Check that the value is between 0 and 1."""
+        if len(value) != 2:
+            raise ValueError("Size must be a list of two floats.")
+        if min(value) < 0 or max(value) > 1:
+            raise ValueError("Size must be a list of floats between 0 and 1.")
+        return value
 
 
 @dataclass(config=ConfigDict(extra="forbid"))

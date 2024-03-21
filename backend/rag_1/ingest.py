@@ -39,7 +39,11 @@ def ingest_pdf(file_path: str | Path, config: DictConfig) -> None:
     )
 
     # Get images
-    images = select_images(raw_pdf_elements, config.ingest.metadata_keys)
+    images = select_images(
+        raw_pdf_elements,
+        metadata_keys=config.ingest.metadata_keys,
+        min_size=config.ingest.image_min_size,
+    )
 
     # Get chunks
     if config.ingest.chunking_enable:
@@ -49,9 +53,12 @@ def ingest_pdf(file_path: str | Path, config: DictConfig) -> None:
         chunks = raw_pdf_elements
 
     # Get text, tables
-    texts = select_texts(chunks, config.ingest.metadata_keys)
+    texts = select_texts(chunks, metadata_keys=config.ingest.metadata_keys)
     tables = select_tables(
-        chunks, config.ingest.table_format, config.ingest.metadata_keys
+        chunks,
+        table_format=config.ingest.table_format,
+        metadata_keys=config.ingest.metadata_keys,
+        min_size=config.ingest.table_min_size,
     )
 
     vectorstore = get_vectorstore(config)
