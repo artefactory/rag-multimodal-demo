@@ -41,13 +41,14 @@ store:
   root_path: "${..path.database}/multi_vector_retriever_metadata/"
 
 retriever:
-  _target_: langchain.retrievers.multi_vector.MultiVectorRetriever
+  _target_: backend.utils.multi_vector.ThresholdedMultiVectorRetriever
   vectorstore: ${..vectorstore}
   byte_store: ${..store}
   id_key: "doc_id"
-  search_type: "similarity"
+  search_type: "similarity_score_threshold"
   search_kwargs:
     k: 4
+    score_threshold: 0.5
 
 ingest:
   clear_database: True

@@ -28,9 +28,10 @@ vectorstore:
 retriever:
   _target_: langchain_core.vectorstores.VectorStoreRetriever
   vectorstore: ${..vectorstore}
-  search_type: "similarity"
+  search_type: "similarity_score_threshold"
   search_kwargs:
     k: 4
+    score_threshold: 0.5
 
 ingest:
   clear_database: True
