@@ -65,6 +65,8 @@ ingest:
     - filename
     - page_number
   table_format: "html" # "text" or "html" or "image"
+  image_min_size: [0.1, 0.1]
+  table_min_size: [0.0, 0.0]
 
   summarize_text: False
   summarize_table: True
