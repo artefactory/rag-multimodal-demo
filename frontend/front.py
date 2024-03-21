@@ -2,7 +2,7 @@ import streamlit as st
 from langserve import RemoteRunnable
 from PIL import Image
 
-from frontend import ASSETS_PATH, BACKEND_URL
+from frontend import ASSETS_PATH, BACKEND_URL_RAG
 from frontend.lib.auth import authentication_page, create_session
 from frontend.lib.backend_interface import (
     backend_supports_auth,
@@ -37,7 +37,7 @@ if __name__ == "__main__":
 
     # The chain is our RAG that will be used to answer questions.
     # Langserve's RemoteRunnable allows us to work as if the RAG was local, but it's actually running on the backend
-    initialize_state_variable("chain", value=RemoteRunnable(BACKEND_URL))
+    initialize_state_variable("chain", value=RemoteRunnable(BACKEND_URL_RAG))
 
     # If the backend supports authentication but the user is not authenticated, show the authentication page
     if (

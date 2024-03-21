@@ -5,7 +5,7 @@ import requests
 import streamlit as st
 from langserve import RemoteRunnable
 
-from frontend import ADMIN_MODE, BACKEND_URL
+from frontend import ADMIN_MODE, BACKEND_URL_RAG
 from frontend.lib.backend_interface import create_session
 
 
@@ -107,6 +107,6 @@ def sign_up(username: str, password: str) -> bool:
 def authenticate_session(session, bearer_token: str) -> requests.Session:
     session.headers.update({"Authorization": f"Bearer {bearer_token}"})
     st.session_state["chain"] = RemoteRunnable(
-        BACKEND_URL, headers={"Authorization": f"Bearer {bearer_token}"}
+        BACKEND_URL_RAG, headers={"Authorization": f"Bearer {bearer_token}"}
     )
     return session
