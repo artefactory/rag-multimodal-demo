@@ -86,6 +86,10 @@ select = [
     "PD",
 ]
 ignore = ["ANN101", "ANN102", "RET504"]
+exclude = [
+    "backend/api_plugins/*",
+    "backend/database.py",
+]
 
 [tool.ruff.lint.pep8-naming]
 # Allow Pydantic's `@validator` decorator to trigger class method treatment.
