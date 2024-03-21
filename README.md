@@ -40,6 +40,15 @@ including text, images, and tables. It utilizes a retriever to store and manage 
 
 For all options, we can choose to treat tables as text or images.
 
+**Common parameters**:
+
+- `ingest.clear_database` : Whether to clear the database before ingesting new data.
+- `ingest.metadata_keys` : Unstructured metadata to use.
+- `ingest.table_format` : How to extract table with Unstructured (`text`, `html` or `image`).
+- `ingest.image_min_size` : Minimum relative size for images to be considered.
+- `ingest.table_min_size` : Minimum relative size for tables to be considered.
+- `ingest.export_extracted` : Whether to export extracted elements in local folder.
+
 ### RAG Option 1
 
 Folder: [backend/rag_1](backend/rag_1)
@@ -55,13 +64,6 @@ Backend:
 - Use [Open Clip](https://github.com/mlfoundations/open_clip) multi-modal embeddings.
 - Use [Chroma](https://www.trychroma.com/) with support for multi-modal.
 - Use GPT-4V for final answer synthesis from join review of images and texts (or tables).
-
-Parameters:
-
-- `ingest.clear_database` : Whether to clear the database before ingesting new data.
-- `ingest.metadata_keys` : Unstructured metadata to use.
-- `ingest.table_format` : How to extract table with Unstructured (`text`, `html` or `image`).
-- `ingest.export_extracted` : Whether to export extracted elements in local folder.
 
 ### RAG Option 2
 
@@ -80,16 +82,12 @@ Backend:
 - Use GPT-4V for image summarization.
 - Use GPT-4 for final answer synthesis from join review of image summaries and texts (or tables).
 
-Parameters:
+**Specific parameters:**
 
-- `ingest.clear_database` : Whether to clear the database before ingesting new data.
-- `ingest.metadata_keys` : Unstructured metadata to use.
-- `ingest.table_format` : How to extract tables with Unstructured (`text`, `html` or `image`).
 - `ingest.summarize_text` : Whether to summarize texts with an LLM or use raw texts for retrieval.
 - `ingest.summarize_table` : Whether to summarize tables with LLM or use raw tables for retrieval.
 - `ingest.vectorstore_source` : The field of documents to add into the vectorstore (`content` or `summary`).
 - `ingest.docstore_source` : The field of documents to add into the docstore (`content` or `summary`).
-- `ingest.export_extracted` : Whether to export extracted elements to a local folder.
 
 In option 2, the vectorstore and docstore must be populated with text documents (text content or summary).
 
@@ -109,16 +107,12 @@ Backend:
   with [Chroma](https://www.trychroma.com/) to store raw text (or tables) and images (in a docstore) along with their summaries (in a vectorstore) for retrieval.
 - Use GPT-4V for both image summarization (for retrieval) as well as final answer synthesis from join review of images and texts (or tables).
 
-Parameters:
+**Specific parameters:**
 
-- `ingest.clear_database` : Whether to clear the database before ingesting new data.
-- `ingest.metadata_keys` : Unstructured metadata to use.
-- `ingest.table_format` : How to extract tables with Unstructured (`text`, `html` or `image`).
 - `ingest.summarize_text` : Whether to summarize texts with an LLM or use raw texts for retrieval.
 - `ingest.summarize_table` : Whether to summarize tables with LLM or use raw tables for retrieval.
 - `ingest.vectorstore_source` : The field of documents to add into the vectorstore (`content` or `summary`).
 - `ingest.docstore_source` : The field of documents to add into the docstore (`content` or `summary`).
-- `ingest.export_extracted` : Whether to export extracted elements to a local folder.
 
 In option 3, the vectorstore must be populated with text documents (text content or summary) as in option 2. However, the docstore can be populated with either text or image documents.
 
