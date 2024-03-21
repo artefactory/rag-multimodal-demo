@@ -19,7 +19,7 @@ vision_llm:
   azure_endpoint: ${oc.env:VISION_OPENAI_ENDPOINT}
   openai_api_key: ${oc.env:VISION_OPENAI_API_KEY}
   openai_api_version: "2024-02-15-preview"
-  deployment_name: "gpt-4-vision"
+  deployment_name: "gpt4-vision"
   temperature: 0.0
   max_tokens: 1024
 
