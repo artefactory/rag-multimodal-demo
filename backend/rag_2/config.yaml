@@ -45,6 +45,9 @@ retriever:
   vectorstore: ${..vectorstore}
   byte_store: ${..store}
   id_key: "doc_id"
+  search_type: "similarity"
+  search_kwargs:
+    k: 4
 
 ingest:
   clear_database: True

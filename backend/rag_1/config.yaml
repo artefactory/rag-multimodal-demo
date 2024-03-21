@@ -29,6 +29,8 @@ retriever:
   _target_: langchain_core.vectorstores.VectorStoreRetriever
   vectorstore: ${..vectorstore}
   search_type: "similarity"
+  search_kwargs:
+    k: 4
 
 ingest:
   clear_database: True
