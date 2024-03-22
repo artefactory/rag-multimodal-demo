@@ -36,8 +36,16 @@ def sidebar():
                 st.sidebar.markdown(time_ago)
                 for chat in chats:
                     chat_id = chat["id"]
+                    chat_first_message = chat["first_message"]
+                    label = (
+                        truncate_label(chat_first_message, 100)
+                        if chat_first_message
+                        else "*No content*"
+                    )
                     if st.sidebar.button(
-                        chat_id, key=chat_id, use_container_width=True
+                        label=label,
+                        key=chat_id,
+                        use_container_width=True,
                     ):
                         st.session_state["chat_id"] = chat_id
                         messages = [
@@ -54,3 +62,18 @@ def list_sessions():
 def get_session(session_id: str):
     session = query("get", f"/session/{session_id}").json()
     return session
+
+
+def truncate_label(string: str, max_len: int) -> str:
+    """Truncate a string to a maximum length, appending ellipsis if necessary.
+
+    Args:
+        string (str): String to be truncated.
+        max_len (int): Maximum allowed length of the string after truncation.
+
+    Returns:
+        str: Truncated string.
+    """
+    if string and len(string) > max_len:
+        string = string[: max_len - 3] + "..."
+    return string
