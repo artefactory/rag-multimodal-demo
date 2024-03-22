@@ -81,3 +81,7 @@ ingest:
     image: "summary"
 
   export_extracted: True
+
+rag:
+  database_url: ${oc.env:DATABASE_URL}
+  enable_chat_memory: ${oc.decode:${oc.env:ENABLE_AUTHENTICATION}}

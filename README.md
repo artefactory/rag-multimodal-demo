@@ -11,6 +11,7 @@
   - [RAG Option 1](#rag-option-1)
   - [RAG Option 2](#rag-option-2)
   - [RAG Option 3](#rag-option-3)
+  - [Frontend](#frontend)
 - [Installation](#installation)
 - [Usage](#usage)
 - [Development](#development)
@@ -116,6 +117,10 @@ Backend:
 
 In option 3, the vectorstore must be populated with text documents (text content or summary) as in option 2. However, the docstore can be populated with either text or image documents.
 
+### Frontend
+
+The demo Streamlit comes from [skaff-rag-accelerator](https://github.com/artefactory/skaff-rag-accelerator/). Please read [documentation](https://artefactory.github.io/skaff-rag-accelerator/) for more details.
+
 ## Installation
 
 To set up the project, ensure you have Python version between 3.10 and 3.11. Then install the dependencies using Poetry:
@@ -162,7 +167,7 @@ To use the RAG Multimodal Demo, follow these steps:
 2. Start the backend server locally:
 
 ```bash
-make serve
+make serve_backend
 ```
 
 This command will launch the backend server, allowing you to access the FastAPI documentation and playground interfaces :
@@ -171,6 +176,12 @@ This command will launch the backend server, allowing you to access the FastAPI 
 - RAG Option 1 playground interface: <http://0.0.0.0:8000/rag-1/playground/>
 - RAG Option 2 playground interface: <http://0.0.0.0:8000/rag-2/playground/>
 - RAG Option 3 playground interface: <http://0.0.0.0:8000/rag-3/playground/>
+
+3. Launch the Streamlit frontend interface:
+
+```bash
+make serve_frontend
+```
 
 ## Development
 

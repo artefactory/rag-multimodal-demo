@@ -4,9 +4,16 @@ from langchain_core.documents import Document
 from langchain_core.messages import BaseMessage, HumanMessage
 from langchain_core.output_parsers.string import StrOutputParser
 from langchain_core.runnables import RunnableLambda, RunnablePassthrough
-from langchain_core.runnables.base import RunnableSequence
+from langchain_core.runnables.base import (
+    RunnableSequence,
+    RunnableSerializable,
+)
 from omegaconf.dictconfig import DictConfig
+from pydantic import BaseModel
 
+from backend.rag_components.chain_links.rag_with_history import (
+    construct_rag_with_history,
+)
 from backend.utils.image import resize_base64_image
 from backend.utils.llm import get_vision_llm
 from backend.utils.retriever import get_retriever
@@ -83,7 +90,19 @@ def img_prompt_func(data_dict: dict) -> list[BaseMessage]:
     return [HumanMessage(content=messages)]
 
 
-def get_chain(config: DictConfig) -> RunnableSequence:
+class Question(BaseModel):
+    """Question to be answered."""
+
+    question: str
+
+
+class Response(BaseModel):
+    """Response to the question."""
+
+    response: str
+
+
+def get_base_chain(config: DictConfig) -> RunnableSequence:
     """Constructs a RAG pipeline that retrieves image and text data from documents.
 
     The pipeline consists of the following steps:
@@ -112,5 +131,22 @@ def get_chain(config: DictConfig) -> RunnableSequence:
         | model
         | StrOutputParser()
     )
+    typed_chain = chain.with_types(input_type=str, output_type=Response)
 
-    return chain
+    return typed_chain
+
+
+def get_chain(config: DictConfig) -> RunnableSerializable:
+    """Get the appropriate RAG pipeline based on the configuration.
+
+    Args:
+        config (DictConfig): Configuration object.
+
+    Returns:
+        RunnableSerializable: RAG pipeline.
+    """
+    base_chain = get_base_chain(config)
+    if config.rag.enable_chat_memory:
+        chain_with_mem = construct_rag_with_history(base_chain, config)
+        return chain_with_mem
+    return base_chain

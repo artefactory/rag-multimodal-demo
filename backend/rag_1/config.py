@@ -57,6 +57,14 @@ class IngestConfig:
 
 
 @dataclass(config=ConfigDict(extra="forbid"))
+class RagConfig:
+    """Configuration for RAG."""
+
+    database_url: str
+    enable_chat_memory: bool
+
+
+@dataclass(config=ConfigDict(extra="forbid"))
 class Config:
     """Configuration for the RAG Option 1."""
 
@@ -64,12 +72,15 @@ class Config:
 
     path: PathConfig
 
+    text_llm: HydraObject
     vision_llm: HydraObject
     embedding: HydraObject
     vectorstore: HydraObject
     retriever: HydraObject
 
     ingest: IngestConfig
+
+    rag: RagConfig
 
 
 def validate_config(config: DictConfig) -> Config:

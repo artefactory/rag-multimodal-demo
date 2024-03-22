@@ -5,6 +5,15 @@ path:
   export_extracted: "${.docs}/extracted/${..name}"
   database: "database/${..name}"
 
+text_llm:
+  _target_: langchain_openai.AzureChatOpenAI
+  azure_endpoint: ${oc.env:TEXT_OPENAI_ENDPOINT}
+  openai_api_key: ${oc.env:TEXT_OPENAI_API_KEY}
+  openai_api_version: "2024-02-15-preview"
+  deployment_name: "gpt4-turbo"
+  temperature: 0.0
+  max_tokens: 1024
+
 vision_llm:
   _target_: langchain_openai.AzureChatOpenAI
   azure_endpoint: ${oc.env:VISION_OPENAI_ENDPOINT}
@@ -51,3 +60,7 @@ ingest:
   table_min_size: [0.0, 0.0]
 
   export_extracted: True
+
+rag:
+  database_url: ${oc.env:DATABASE_URL}
+  enable_chat_memory: ${oc.decode:${oc.env:ENABLE_AUTHENTICATION}}

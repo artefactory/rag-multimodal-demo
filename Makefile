@@ -7,5 +7,8 @@ ingest_rag_2:
 ingest_rag_3:
 	poetry run python -m backend.rag_3.ingest
 
-serve:
+serve_backend:
 	poetry run python -m app.server
+
+serve_frontend:
+	poetry run python -m streamlit run frontend/front.py
