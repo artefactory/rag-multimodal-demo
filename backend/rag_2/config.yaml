@@ -10,7 +10,7 @@ text_llm:
   azure_endpoint: ${oc.env:TEXT_OPENAI_ENDPOINT}
   openai_api_key: ${oc.env:TEXT_OPENAI_API_KEY}
   openai_api_version: "2024-02-15-preview"
-  deployment_name: "gpt4"
+  deployment_name: "gpt4-turbo"
   temperature: 0.0
   max_tokens: 1024
 
