@@ -72,6 +72,7 @@ class Config:
 
     path: PathConfig
 
+    text_llm: HydraObject
     vision_llm: HydraObject
     embedding: HydraObject
     vectorstore: HydraObject
