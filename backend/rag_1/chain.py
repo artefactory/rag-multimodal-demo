@@ -1,5 +1,6 @@
 """RAG chain for Option 1."""
 
+from langchain.schema import format_document
 from langchain_core.documents import Document
 from langchain_core.messages import BaseMessage, HumanMessage
 from langchain_core.output_parsers.string import StrOutputParser
@@ -33,7 +34,8 @@ def split_image_text_types(docs: list[Document]) -> dict[str, list]:
     for doc in docs:
         match doc.metadata["type"]:
             case "text":
-                text_list.append(doc.page_content)
+                formatted_doc = format_document(doc, prompts.DOCUMENT_TEMPLATE)
+                text_list.append(formatted_doc)
             case "image":
                 img = doc.page_content
                 img = resize_base64_image(img)
@@ -46,7 +48,8 @@ def split_image_text_types(docs: list[Document]) -> dict[str, list]:
                     img_base64_list.append(img)
                     img_mime_type_list.append(doc.metadata["mime_type"])
                 else:
-                    text_list.append(doc.page_content)
+                    formatted_doc = format_document(doc, prompts.DOCUMENT_TEMPLATE)
+                    text_list.append(formatted_doc)
 
     return {
         "images": img_base64_list,
@@ -55,16 +58,19 @@ def split_image_text_types(docs: list[Document]) -> dict[str, list]:
     }
 
 
-def img_prompt_func(data_dict: dict) -> list[BaseMessage]:
-    """Join the context into a single string.
+def img_prompt_func(
+    data_dict: dict, document_separator: str = "\n\n"
+) -> list[BaseMessage]:
+    r"""Join the context into a single string.
 
     Args:
         data_dict (dict): Dictionary containing the context and question.
+        document_separator (str, optional): _description_. Defaults to "\n\n".
 
     Returns:
         list[BaseMessage]: List of messages to be sent to the model.
     """
-    formatted_texts = "\n".join(data_dict["context"]["texts"])
+    formatted_texts = document_separator.join(data_dict["context"]["texts"])
     messages = []
 
     # Adding image(s) to the messages if present
