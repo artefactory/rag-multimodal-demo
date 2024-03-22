@@ -167,7 +167,7 @@ To use the RAG Multimodal Demo, follow these steps:
 2. Start the backend server locally:
 
 ```bash
-make serve
+make serve_backend
 ```
 
 This command will launch the backend server, allowing you to access the FastAPI documentation and playground interfaces :
@@ -180,7 +180,7 @@ This command will launch the backend server, allowing you to access the FastAPI 
 3. Launch the Streamlit frontend interface:
 
 ```bash
-make launch_frontend
+make serve_frontend
 ```
 
 ## Development
