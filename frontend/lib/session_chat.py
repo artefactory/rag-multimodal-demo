@@ -53,7 +53,7 @@ def session_chat():
 
                 placeholder = st.empty()
                 for chunk in response:
-                    full_response += chunk.content
+                    full_response += chunk
                     placeholder.write(full_response)
 
             bot_message = Message("assistant", full_response, session_id)
