@@ -49,7 +49,9 @@ async def generate_text_summaries(
     prompt = ChatPromptTemplate.from_template(prompt_template)
 
     # Text summary chain
-    summarize_chain = {"text": lambda x: x} | prompt | model | StrOutputParser()
+    summarize_chain = (
+        {"text": lambda x: x} | prompt | model | StrOutputParser()
+    ).with_config({"run_name": "TextSummarization"})
 
     # Initialize empty summaries
     text_summaries = []
@@ -113,7 +115,9 @@ async def generate_image_summaries(
         ]
         return messages
 
-    chain = RunnableLambda(_get_messages_from_url) | model | StrOutputParser()
+    chain = (
+        RunnableLambda(_get_messages_from_url) | model | StrOutputParser()
+    ).with_config({"run_name": "ImageSummarization"})
 
     logger.info(f"Summarizing {len(img_base64_list)} images")
 
