@@ -8,7 +8,7 @@ from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import BaseMessage, HumanMessage
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.runnables import RunnableLambda
+from langchain_core.runnables import Runnable, RunnableLambda
 from tenacity import (
     before_log,
     retry,
@@ -27,6 +27,22 @@ logger = logging.getLogger(__name__)
     before=before_log(logger, logging.INFO),
     # after=after_log(logger, logging.INFO),
 )
+async def abatch_with_retry(chain: Runnable, batch: list) -> list:
+    """Process a batch of items, applying retries on failure.
+
+    This function is designed to handle exceptions such as rate limits or bad requests
+    by retrying the operation with exponential backoff and a maximum delay.
+
+    Args:
+        chain (Runnable): Langchain chain.
+        batch (list): List of items to be processed by the chain.
+
+    Returns:
+        list: List of results.
+    """
+    return await chain.abatch(batch)
+
+
 async def generate_text_summaries(
     text_list: list[str],
     prompt_template: str,
@@ -61,19 +77,12 @@ async def generate_text_summaries(
     # Process texts in batches
     for i in range(0, len(text_list), batch_size):
         batch = text_list[i : i + batch_size]
-        batch_summaries = await summarize_chain.abatch(batch)
+        batch_summaries = await abatch_with_retry(summarize_chain, batch)
         text_summaries.extend(batch_summaries)
 
     return text_summaries
 
 
-@retry(
-    retry=retry_if_exception_type((openai.RateLimitError, openai.BadRequestError)),
-    wait=wait_exponential(multiplier=10, min=10, max=160),
-    stop=stop_after_delay(300),
-    before=before_log(logger, logging.INFO),
-    # after=after_log(logger, logging.INFO),
-)
 async def generate_image_summaries(
     img_base64_list: list[str],
     img_mime_type_list: list[str],
@@ -137,7 +146,7 @@ async def generate_image_summaries(
                 strict=False,
             )
         ]
-        batch_summaries = await chain.abatch(batch)
+        batch_summaries = await abatch_with_retry(chain, batch)
         image_summaries.extend(batch_summaries)
 
     return image_summaries
