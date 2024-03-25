@@ -41,7 +41,7 @@ store:
   root_path: "${..path.database}/multi_vector_retriever_metadata/"
 
 retriever:
-  _target_: backend.utils.multi_vector.ThresholdedMultiVectorRetriever
+  _target_: backend.rag_components.multi_vector.ThresholdedMultiVectorRetriever
   vectorstore: ${..vectorstore}
   byte_store: ${..store}
   id_key: "doc_id"

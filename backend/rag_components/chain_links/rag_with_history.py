@@ -7,7 +7,7 @@ from pydantic import BaseModel
 
 from backend.rag_components.chain_links.condense_question import condense_question
 from backend.rag_components.chat_message_history import get_chat_message_history
-from backend.utils.llm import get_text_llm
+from backend.rag_components.llm import get_text_llm
 
 
 class QuestionWithHistory(BaseModel):

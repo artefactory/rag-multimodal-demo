@@ -16,8 +16,8 @@ from backend.rag_components.chain_links.rag_with_history import (
 from backend.rag_components.chain_links.retrieve_and_format_text_docs import (
     fetch_docs_chain,
 )
-from backend.utils.llm import get_text_llm
-from backend.utils.retriever import get_retriever
+from backend.rag_components.llm import get_text_llm
+from backend.rag_components.retriever import get_retriever
 
 from . import prompts
 

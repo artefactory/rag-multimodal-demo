@@ -12,15 +12,15 @@ from unstructured.partition.pdf import partition_pdf
 
 from backend.rag_3 import prompts
 from backend.rag_3.config import validate_config
-from backend.utils.elements import Image, Table, Text
-from backend.utils.ingest import add_elements_to_multivector_retriever
-from backend.utils.llm import get_text_llm, get_vision_llm
-from backend.utils.retriever import get_retriever
-from backend.utils.summarization import (
+from backend.rag_components.elements import Image, Table, Text
+from backend.rag_components.ingest import add_elements_to_multivector_retriever
+from backend.rag_components.llm import get_text_llm, get_vision_llm
+from backend.rag_components.retriever import get_retriever
+from backend.rag_components.summarization import (
     generate_image_summaries,
     generate_text_summaries,
 )
-from backend.utils.unstructured import (
+from backend.rag_components.unstructured import (
     load_chunking_func,
     select_images,
     select_tables,

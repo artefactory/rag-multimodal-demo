@@ -10,7 +10,7 @@ from IPython.display import HTML, Markdown, display
 from langchain_core.documents import Document
 from pydantic import BaseModel, PrivateAttr, validator
 
-from .image import local_image_to_base64
+from backend.utils.image import local_image_to_base64
 
 
 class Element(BaseModel):
