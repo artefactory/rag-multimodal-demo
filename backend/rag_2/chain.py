@@ -13,6 +13,9 @@ from pydantic import BaseModel
 from backend.rag_components.chain_links.rag_with_history import (
     construct_rag_with_history,
 )
+from backend.rag_components.chain_links.retrieve_and_format_text_docs import (
+    fetch_docs_chain,
+)
 from backend.utils.llm import get_text_llm
 from backend.utils.retriever import get_retriever
 
@@ -55,7 +58,7 @@ def get_base_chain(config: DictConfig) -> RunnableSequence:
     # Define the RAG pipeline
     chain = (
         {
-            "context": retriever,
+            "context": fetch_docs_chain(retriever),
             "question": RunnablePassthrough(),
         }
         | prompt
