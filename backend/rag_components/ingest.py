@@ -4,9 +4,15 @@ import logging
 from collections.abc import Sequence
 
 from langchain.retrievers.multi_vector import MultiVectorRetriever
+from omegaconf.dictconfig import DictConfig
 
-from .elements import Element
+from .elements import Element, Image, Table, Text
+from .llm import get_text_llm, get_vision_llm
 from .retriever import add_documents_multivector
+from .summarization import (
+    generate_image_summaries,
+    generate_text_summaries,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -64,3 +70,114 @@ def add_elements_to_multivector_retriever(
         vectorstore_source=vectorstore_source,
         docstore_source=docstore_source,
     )
+
+
+async def apply_summarize_text(
+    text_list: list[Text], config: DictConfig, prompt_template: str
+) -> None:
+    """Apply text summarization to a list of Text elements.
+
+    The function directly modifies the Text elements inplace.
+
+    Args:
+        text_list (list[Text]): List of Text elements.
+        config (DictConfig): Configuration object.
+        prompt_template (str): Prompt template for the summarization.
+    """
+    if config.ingest.summarize_text:
+        str_list = [text.text for text in text_list]
+
+        model = get_text_llm(config)
+
+        text_summaries = await generate_text_summaries(
+            str_list, prompt_template=prompt_template, model=model
+        )
+
+        for text in text_list:
+            text.set_summary(text_summaries.pop(0))
+
+    else:
+        logger.info("Skipping text summarization")
+
+    return
+
+
+async def apply_summarize_table(
+    table_list: list[Table], config: DictConfig, prompt_template: str
+) -> None:
+    """Apply table summarization to a list of Table elements.
+
+    The function directly modifies the Table elements inplace.
+
+    Args:
+        table_list (list[Table]): List of Table elements.
+        config (DictConfig): Configuration object.
+        prompt_template (str): Prompt template for the summarization.
+
+    Raises:
+        ValueError: If the table format is "image" and summarize_table is False.
+        ValueError: If the table format is invalid.
+    """
+    if config.ingest.summarize_table:
+        table_format = config.ingest.table_format
+        if table_format in ["text", "html"]:
+            str_list = [table.text for table in table_list]
+
+            model = get_text_llm(config)
+
+            table_summaries = await generate_text_summaries(
+                str_list,
+                prompt_template=prompt_template,
+                model=model,
+            )
+        elif config.ingest.table_format == "image":
+            img_base64_list = [table.base64 for table in table_list]
+            img_mime_type_list = [table.mime_type for table in table_list]
+            model = get_vision_llm(config)
+
+            table_summaries = await generate_image_summaries(
+                img_base64_list,
+                img_mime_type_list,
+                prompt=prompt_template,
+                model=model,
+            )
+        else:
+            raise ValueError(f"Invalid table format: {table_format}")
+
+        for table in table_list:
+            table.set_summary(table_summaries.pop(0))
+
+    else:
+        logger.info("Skipping table summarization")
+
+    return
+
+
+async def apply_summarize_image(
+    image_list: list[Image], config: DictConfig, prompt_template: str
+) -> None:
+    """Apply image summarization to a list of Image elements.
+
+    The function directly modifies the Image elements inplace.
+
+    Args:
+        image_list (list[Image]): List of Image elements.
+        config (DictConfig): Configuration object.
+        prompt_template (str): Prompt template for the summarization.
+    """
+    img_base64_list = [image.base64 for image in image_list]
+    img_mime_type_list = [image.mime_type for image in image_list]
+
+    model = get_vision_llm(config)
+
+    image_summaries = await generate_image_summaries(
+        img_base64_list,
+        img_mime_type_list,
+        prompt=prompt_template,
+        model=model,
+    )
+
+    for image in image_list:
+        image.set_summary(image_summaries.pop(0))
+
+    return
