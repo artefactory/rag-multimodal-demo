@@ -31,7 +31,7 @@ async def generate_text_summaries(
     text_list: list[str],
     prompt_template: str,
     model: BaseChatModel,
-    batch_size: int = 50,
+    batch_size: int = 10,
 ) -> list[str]:
     """Generate summaries for a list of texts.
 
@@ -79,7 +79,7 @@ async def generate_image_summaries(
     img_mime_type_list: list[str],
     prompt: str,
     model: BaseChatModel,
-    batch_size: int = 50,
+    batch_size: int = 10,
 ) -> list[str]:
     """Generate summaries for a list of images encoded in base64.
 
