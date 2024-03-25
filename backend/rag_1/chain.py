@@ -1,7 +1,5 @@
 """RAG chain for Option 1."""
 
-from langchain.schema import format_document
-from langchain_core.documents import Document
 from langchain_core.messages import BaseMessage, HumanMessage
 from langchain_core.output_parsers.string import StrOutputParser
 from langchain_core.runnables import RunnableLambda, RunnablePassthrough
@@ -12,56 +10,19 @@ from pydantic import BaseModel
 from backend.rag_components.chain_links.rag_with_history import (
     construct_rag_with_history,
 )
-from backend.utils.image import resize_base64_image
+from backend.rag_components.chain_links.retrieve_and_format_multimodal_docs import (
+    fetch_docs_chain,
+)
 from backend.utils.llm import get_vision_llm
 from backend.utils.retriever import get_retriever
 
 from . import prompts
 
 
-def split_image_text_types(docs: list[Document]) -> dict[str, list]:
-    """Split base64-encoded images and texts.
-
-    Args:
-        docs (list[Document]): List of documents.
-
-    Returns:
-        dict[str, list]: Dictionary containing lists of images, mime types, and texts.
-    """
-    img_base64_list = []
-    img_mime_type_list = []
-    text_list = []
-    for doc in docs:
-        match doc.metadata["type"]:
-            case "text":
-                formatted_doc = format_document(doc, prompts.DOCUMENT_TEMPLATE)
-                text_list.append(formatted_doc)
-            case "image":
-                img = doc.page_content
-                img = resize_base64_image(img)
-                img_base64_list.append(resize_base64_image(img))
-                img_mime_type_list.append(doc.metadata["mime_type"])
-            case "table":
-                if doc.metadata["format"] == "image":
-                    img = doc.page_content
-                    img = resize_base64_image(img)
-                    img_base64_list.append(img)
-                    img_mime_type_list.append(doc.metadata["mime_type"])
-                else:
-                    formatted_doc = format_document(doc, prompts.DOCUMENT_TEMPLATE)
-                    text_list.append(formatted_doc)
-
-    return {
-        "images": img_base64_list,
-        "mime_types": img_mime_type_list,
-        "texts": text_list,
-    }
-
-
 def img_prompt_func(
     data_dict: dict, document_separator: str = "\n\n"
 ) -> list[BaseMessage]:
-    r"""Join the context into a single string.
+    r"""Join the context into a single string with images and the question.
 
     Args:
         data_dict (dict): Dictionary containing the context and question.
@@ -127,7 +88,7 @@ def get_base_chain(config: DictConfig) -> RunnableSequence:
     # Define the RAG pipeline
     chain = (
         {
-            "context": retriever | RunnableLambda(split_image_text_types),
+            "context": fetch_docs_chain(retriever),
             "question": RunnablePassthrough(),
         }
         | RunnableLambda(img_prompt_func)

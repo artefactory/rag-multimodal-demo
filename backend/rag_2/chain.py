@@ -1,11 +1,8 @@
 """RAG chain for Option 2."""
 
-from langchain.prompts import PromptTemplate
-from langchain.schema import format_document
-from langchain_core.documents import Document
 from langchain_core.output_parsers.string import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.runnables import RunnableLambda, RunnablePassthrough
+from langchain_core.runnables import RunnablePassthrough
 from langchain_core.runnables.base import (
     RunnableSequence,
     RunnableSerializable,
@@ -16,25 +13,13 @@ from pydantic import BaseModel
 from backend.rag_components.chain_links.rag_with_history import (
     construct_rag_with_history,
 )
+from backend.rag_components.chain_links.retrieve_and_format_text_docs import (
+    fetch_docs_chain,
+)
 from backend.utils.llm import get_text_llm
 from backend.utils.retriever import get_retriever
 
 from . import prompts
-
-
-def _combine_documents(docs: list[Document], document_separator: str = "\n\n") -> str:
-    r"""_summary_.
-
-    Args:
-        docs (list[Document]): List of documents.
-        document_separator (str, optional): _description_. Defaults to "\n\n".
-
-    Returns:
-        str: _description_
-    """
-    document_prompt = PromptTemplate.from_template(template=prompts.DOCUMENT_TEMPLATE)
-    doc_strings = [format_document(doc, document_prompt) for doc in docs]
-    return document_separator.join(doc_strings)
 
 
 class Question(BaseModel):
@@ -73,7 +58,7 @@ def get_base_chain(config: DictConfig) -> RunnableSequence:
     # Define the RAG pipeline
     chain = (
         {
-            "context": retriever | RunnableLambda(_combine_documents),
+            "context": fetch_docs_chain(retriever),
             "question": RunnablePassthrough(),
         }
         | prompt
