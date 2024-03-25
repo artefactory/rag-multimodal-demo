@@ -96,7 +96,6 @@ select = [
 ignore = ["ANN101", "ANN102", "RET504"]
 exclude = [
     "backend/api_plugins/*",
-    "backend/rag_components/*",
     "backend/database.py",
     "frontend/*",
 ]
