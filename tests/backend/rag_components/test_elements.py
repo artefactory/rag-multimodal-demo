@@ -4,7 +4,14 @@ import pytest
 from pytest import FixtureRequest
 from pytest_lazy_fixtures import lf
 
-from backend.utils.elements import Element, Image, Table, TableImage, TableText, Text
+from backend.rag_components.elements import (
+    Element,
+    Image,
+    Table,
+    TableImage,
+    TableText,
+    Text,
+)
 
 # ----------------------------------- Text ----------------------------------- #
 

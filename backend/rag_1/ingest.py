@@ -10,13 +10,13 @@ from tqdm.auto import tqdm
 from unstructured.partition.pdf import partition_pdf
 
 from backend.rag_1.config import validate_config
-from backend.utils.unstructured import (
+from backend.rag_components.unstructured import (
     load_chunking_func,
     select_images,
     select_tables,
     select_texts,
 )
-from backend.utils.vectorstore import get_vectorstore
+from backend.rag_components.vectorstore import get_vectorstore
 
 logger = logging.getLogger(__name__)
 

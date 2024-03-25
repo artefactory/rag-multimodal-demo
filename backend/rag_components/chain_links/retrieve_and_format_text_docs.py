@@ -4,7 +4,7 @@ from langchain.schema import format_document
 from langchain_core.documents import Document
 from langchain_core.prompts import PromptTemplate
 from langchain_core.retrievers import BaseRetriever
-from langchain_core.runnables.base import RunnableLambda, RunnableSequence
+from langchain_core.runnables import RunnableLambda, RunnableSequence
 from pydantic import BaseModel
 
 DOCUMENT_TEMPLATE = """\

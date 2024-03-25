@@ -8,7 +8,7 @@ from hydra.utils import instantiate
 from omegaconf.dictconfig import DictConfig
 from unstructured.documents.coordinates import RelativeCoordinateSystem
 
-from backend.utils.elements import Image, Table, TableImage, TableText, Text
+from .elements import Image, Table, TableImage, TableText, Text
 
 
 def get_element_size(element: unstructured_elements.Element) -> tuple[float, float]:

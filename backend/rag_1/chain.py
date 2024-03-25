@@ -1,9 +1,13 @@
 """RAG chain for Option 1."""
 
 from langchain_core.messages import BaseMessage, HumanMessage
-from langchain_core.output_parsers.string import StrOutputParser
-from langchain_core.runnables import RunnableLambda, RunnablePassthrough
-from langchain_core.runnables.base import RunnableSequence, RunnableSerializable
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.runnables import (
+    RunnableLambda,
+    RunnablePassthrough,
+    RunnableSequence,
+    RunnableSerializable,
+)
 from omegaconf.dictconfig import DictConfig
 from pydantic import BaseModel
 
@@ -13,8 +17,8 @@ from backend.rag_components.chain_links.rag_with_history import (
 from backend.rag_components.chain_links.retrieve_and_format_multimodal_docs import (
     fetch_docs_chain,
 )
-from backend.utils.llm import get_vision_llm
-from backend.utils.retriever import get_retriever
+from backend.rag_components.llm import get_vision_llm
+from backend.rag_components.retriever import get_retriever
 
 from . import prompts
 

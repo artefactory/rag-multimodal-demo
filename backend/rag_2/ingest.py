@@ -12,15 +12,14 @@ from unstructured.partition.pdf import partition_pdf
 
 from backend.rag_2 import prompts
 from backend.rag_2.config import validate_config
-from backend.utils.elements import Image, Table, Text
-from backend.utils.ingest import add_elements_to_multivector_retriever
-from backend.utils.llm import get_text_llm, get_vision_llm
-from backend.utils.retriever import get_retriever
-from backend.utils.summarization import (
-    generate_image_summaries,
-    generate_text_summaries,
+from backend.rag_components.ingest import (
+    add_elements_to_multivector_retriever,
+    apply_summarize_image,
+    apply_summarize_table,
+    apply_summarize_text,
 )
-from backend.utils.unstructured import (
+from backend.rag_components.retriever import get_retriever
+from backend.rag_components.unstructured import (
     load_chunking_func,
     select_images,
     select_tables,
@@ -28,108 +27,6 @@ from backend.utils.unstructured import (
 )
 
 logger = logging.getLogger(__name__)
-
-
-async def apply_summarize_text(text_list: list[Text], config: DictConfig) -> None:
-    """Apply text summarization to a list of Text elements.
-
-    The function directly modifies the Text elements inplace.
-
-    Args:
-        text_list (list[Text]): List of Text elements.
-        config (DictConfig): Configuration object.
-    """
-    if config.ingest.summarize_text:
-        str_list = [text.text for text in text_list]
-
-        model = get_text_llm(config)
-
-        text_summaries = await generate_text_summaries(
-            str_list, prompt_template=prompts.TEXT_SUMMARIZATION_PROMPT, model=model
-        )
-
-        for text in text_list:
-            text.set_summary(text_summaries.pop(0))
-
-    else:
-        logger.info("Skipping text summarization")
-
-    return
-
-
-async def apply_summarize_table(table_list: list[Table], config: DictConfig) -> None:
-    """Apply table summarization to a list of Table elements.
-
-    The function directly modifies the Table elements inplace.
-
-    Args:
-        table_list (list[Table]): List of Table elements.
-        config (DictConfig): Configuration object.
-
-    Raises:
-        ValueError: If the table format is "image" and summarize_table is False.
-        ValueError: If the table format is invalid.
-    """
-    if config.ingest.summarize_table:
-        table_format = config.ingest.table_format
-        if table_format in ["text", "html"]:
-            str_list = [table.text for table in table_list]
-
-            model = get_text_llm(config)
-
-            table_summaries = await generate_text_summaries(
-                str_list,
-                prompt_template=prompts.TABLE_SUMMARIZATION_PROMPT,
-                model=model,
-            )
-        elif config.ingest.table_format == "image":
-            img_base64_list = [table.base64 for table in table_list]
-            img_mime_type_list = [table.mime_type for table in table_list]
-            model = get_vision_llm(config)
-
-            table_summaries = await generate_image_summaries(
-                img_base64_list,
-                img_mime_type_list,
-                prompt=prompts.TABLE_SUMMARIZATION_PROMPT,
-                model=model,
-            )
-        else:
-            raise ValueError(f"Invalid table format: {table_format}")
-
-        for table in table_list:
-            table.set_summary(table_summaries.pop(0))
-
-    else:
-        logger.info("Skipping table summarization")
-
-    return
-
-
-async def apply_summarize_image(image_list: list[Image], config: DictConfig) -> None:
-    """Apply image summarization to a list of Image elements.
-
-    The function directly modifies the Image elements inplace.
-
-    Args:
-        image_list (list[Image]): List of Image elements.
-        config (DictConfig): Configuration object.
-    """
-    img_base64_list = [image.base64 for image in image_list]
-    img_mime_type_list = [image.mime_type for image in image_list]
-
-    model = get_vision_llm(config)
-
-    image_summaries = await generate_image_summaries(
-        img_base64_list,
-        img_mime_type_list,
-        prompt=prompts.IMAGE_SUMMARIZATION_PROMPT,
-        model=model,
-    )
-
-    for image in image_list:
-        image.set_summary(image_summaries.pop(0))
-
-    return
 
 
 async def ingest_pdf(file_path: str | Path, config: DictConfig) -> None:
@@ -173,13 +70,25 @@ async def ingest_pdf(file_path: str | Path, config: DictConfig) -> None:
     )
 
     # Summarize text
-    await apply_summarize_text(texts, config)
+    await apply_summarize_text(
+        text_list=texts,
+        config=config,
+        prompt_template=prompts.TEXT_SUMMARIZATION_PROMPT,
+    )
 
     # Summarize tables
-    await apply_summarize_table(tables, config)
+    await apply_summarize_table(
+        table_list=tables,
+        config=config,
+        prompt_template=prompts.TABLE_SUMMARIZATION_PROMPT,
+    )
 
     # Summarize images
-    await apply_summarize_image(images, config)
+    await apply_summarize_image(
+        image_list=images,
+        config=config,
+        prompt_template=prompts.IMAGE_SUMMARIZATION_PROMPT,
+    )
 
     retriever = get_retriever(config)
 

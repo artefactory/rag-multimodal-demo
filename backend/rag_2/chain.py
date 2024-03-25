@@ -1,9 +1,9 @@
 """RAG chain for Option 2."""
 
-from langchain_core.output_parsers.string import StrOutputParser
+from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.runnables import RunnablePassthrough
-from langchain_core.runnables.base import (
+from langchain_core.runnables import (
+    RunnablePassthrough,
     RunnableSequence,
     RunnableSerializable,
 )
@@ -16,8 +16,8 @@ from backend.rag_components.chain_links.rag_with_history import (
 from backend.rag_components.chain_links.retrieve_and_format_text_docs import (
     fetch_docs_chain,
 )
-from backend.utils.llm import get_text_llm
-from backend.utils.retriever import get_retriever
+from backend.rag_components.llm import get_text_llm
+from backend.rag_components.retriever import get_retriever
 
 from . import prompts
 

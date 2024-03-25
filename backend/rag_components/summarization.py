@@ -4,9 +4,9 @@ import logging
 from collections.abc import Sequence
 
 import openai
-from langchain_core.language_models.chat_models import BaseChatModel
+from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import BaseMessage, HumanMessage
-from langchain_core.output_parsers.string import StrOutputParser
+from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnableLambda
 from tenacity import (
