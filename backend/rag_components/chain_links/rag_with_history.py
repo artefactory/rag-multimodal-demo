@@ -1,13 +1,14 @@
 """RAG pipeline with memory."""
 
-from langchain_core.runnables.base import RunnableSequence
+from langchain_core.runnables import RunnableSequence
 from langchain_core.runnables.history import RunnableWithMessageHistory
 from omegaconf import DictConfig
 from pydantic import BaseModel
 
-from backend.rag_components.chain_links.condense_question import condense_question
 from backend.rag_components.chat_message_history import get_chat_message_history
 from backend.rag_components.llm import get_text_llm
+
+from .condense_question import condense_question
 
 
 class QuestionWithHistory(BaseModel):

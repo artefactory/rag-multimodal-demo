@@ -1,7 +1,7 @@
 """Utility functions for instantiating language models."""
 
 from hydra.utils import instantiate
-from langchain_core.language_models.chat_models import BaseChatModel
+from langchain_core.language_models import BaseChatModel
 from omegaconf.dictconfig import DictConfig
 
 

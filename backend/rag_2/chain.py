@@ -1,9 +1,9 @@
 """RAG chain for Option 2."""
 
-from langchain_core.output_parsers.string import StrOutputParser
+from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.runnables import RunnablePassthrough
-from langchain_core.runnables.base import (
+from langchain_core.runnables import (
+    RunnablePassthrough,
     RunnableSequence,
     RunnableSerializable,
 )

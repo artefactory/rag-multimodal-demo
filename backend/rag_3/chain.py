@@ -1,9 +1,10 @@
 """RAG chain for Option 3."""
 
 from langchain_core.messages import BaseMessage, HumanMessage
-from langchain_core.output_parsers.string import StrOutputParser
-from langchain_core.runnables import RunnableLambda, RunnablePassthrough
-from langchain_core.runnables.base import (
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.runnables import (
+    RunnableLambda,
+    RunnablePassthrough,
     RunnableSequence,
     RunnableSerializable,
 )
