@@ -9,7 +9,7 @@ from frontend.lib.session_chat import Message
 
 def sidebar():
     with st.sidebar:
-        st.sidebar.title("RAG Industrialization Kit", anchor="top")
+        st.sidebar.title("RAG demo - BPI x Artefact", anchor="top")
         st.sidebar.markdown(
             f"<p style='color:grey;'>Logged in as {st.session_state['email']}</p>",
             unsafe_allow_html=True,
