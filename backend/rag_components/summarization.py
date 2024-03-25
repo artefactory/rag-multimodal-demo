@@ -11,6 +11,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import Runnable, RunnableLambda
 from tenacity import (
     before_log,
+    before_sleep_log,
     retry,
     retry_if_exception_type,
     stop_after_delay,
@@ -22,10 +23,11 @@ logger = logging.getLogger(__name__)
 
 @retry(
     retry=retry_if_exception_type((openai.RateLimitError, openai.BadRequestError)),
-    wait=wait_exponential(multiplier=10, min=10, max=160),
-    stop=stop_after_delay(300),
+    wait=wait_exponential(multiplier=60, max=180),
+    stop=stop_after_delay(600),
     before=before_log(logger, logging.INFO),
     # after=after_log(logger, logging.INFO),
+    before_sleep=before_sleep_log(logger, logging.INFO),
 )
 async def abatch_with_retry(chain: Runnable, batch: list) -> list:
     """Process a batch of items, applying retries on failure.
