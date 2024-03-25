@@ -50,25 +50,30 @@ def session_routes(
         user_email = current_user.email if current_user else "unauthenticated"
         chats = []
         with Database() as connection:
-            # Join session with message_history and get the first message
-            result = connection.execute(
-                "SELECT s.id, s.timestamp, mh.message FROM session s LEFT JOIN (SELECT"
-                " *, ROW_NUMBER() OVER (PARTITION BY session_id ORDER BY timestamp ASC)"
-                " as rn FROM message_history) mh ON s.id = mh.session_id AND mh.rn = 1"
-                " WHERE s.user_id = ? ORDER BY s.timestamp DESC",
-                (user_email,),
+            # Check if message_history table exists
+            message_history_exists = connection.fetchone(
+                "SELECT name FROM sqlite_master WHERE type='table' AND name='message_history'"
             )
-            for row in result:
-                # Extract the first message content if available
-                first_message_content = (
-                    json.loads(row[2])["data"]["content"] if row[2] else ""
+            if message_history_exists:
+                # Join session with message_history and get the first message
+                result = connection.execute(
+                    "SELECT s.id, s.timestamp, mh.message FROM session s LEFT JOIN (SELECT"
+                    " *, ROW_NUMBER() OVER (PARTITION BY session_id ORDER BY timestamp ASC)"
+                    " as rn FROM message_history) mh ON s.id = mh.session_id AND mh.rn = 1"
+                    " WHERE s.user_id = ? ORDER BY s.timestamp DESC",
+                    (user_email,),
                 )
-                chat = {
-                    "id": row[0],
-                    "timestamp": row[1],
-                    "first_message": first_message_content,
-                }
-                chats.append(chat)
+                for row in result:
+                    # Extract the first message content if available
+                    first_message_content = (
+                        json.loads(row[2])["data"]["content"] if row[2] else ""
+                    )
+                    chat = {
+                        "id": row[0],
+                        "timestamp": row[1],
+                        "first_message": first_message_content,
+                    }
+                    chats.append(chat)
         return chats
 
     @app.get("/session/{session_id}")
