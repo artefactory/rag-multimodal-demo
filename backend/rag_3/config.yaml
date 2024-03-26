@@ -55,6 +55,16 @@ retriever:
 ingest:
   clear_database: True
 
+  partition_pdf_func:
+    _target_: unstructured.partition.pdf.partition_pdf
+    _partial_: True
+    _convert_: all
+    strategy: "hi_res"
+    infer_table_structure: False
+    hi_res_model_name: "yolox"
+    extract_image_block_types: ["image", "table"]
+    extract_image_block_to_payload: True
+
   chunking_enable: True
   chunking_func:
     _target_: unstructured.chunking.title.chunk_by_title

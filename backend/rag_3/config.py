@@ -44,6 +44,9 @@ class IngestConfig:
     """Configuration for PDF ingestion."""
 
     clear_database: bool
+
+    partition_pdf_func: HydraObject
+
     chunking_enable: bool
     chunking_func: HydraObject
 
