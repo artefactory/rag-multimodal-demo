@@ -160,6 +160,24 @@ def select_tables(
     return tables
 
 
+def load_partition_pdf_func(config: DictConfig) -> Callable:
+    """Load the partition_pdf function from the configuration.
+
+    Args:
+        config (DictConfig): Configuration object.
+
+    Raises:
+        ValueError: If the partition_pdf function is not callable.
+
+    Returns:
+        Callable: The partition_pdf function.
+    """
+    func = instantiate(config.ingest.partition_pdf_func)
+    if not callable(func):
+        raise ValueError("partition_pdf function must be callable")
+    return func
+
+
 def load_chunking_func(config: DictConfig) -> Callable:
     """Load the chunking function from the configuration.
 

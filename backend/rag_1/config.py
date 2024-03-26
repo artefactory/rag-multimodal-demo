@@ -36,6 +36,8 @@ class IngestConfig:
 
     clear_database: bool
 
+    partition_pdf_func: HydraObject
+
     chunking_enable: bool
     chunking_func: HydraObject
 

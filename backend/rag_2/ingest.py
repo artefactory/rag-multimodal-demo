@@ -8,7 +8,6 @@ from pathlib import Path
 import hydra
 from omegaconf.dictconfig import DictConfig
 from tqdm.auto import tqdm
-from unstructured.partition.pdf import partition_pdf
 
 from backend.rag_2 import prompts
 from backend.rag_2.config import validate_config
@@ -21,6 +20,7 @@ from backend.rag_components.ingest import (
 from backend.rag_components.retriever import get_retriever
 from backend.rag_components.unstructured import (
     load_chunking_func,
+    load_partition_pdf_func,
     select_images,
     select_tables,
     select_texts,
@@ -39,12 +39,8 @@ async def ingest_pdf(file_path: str | Path, config: DictConfig) -> None:
     logger.info(f"Processing {file_path}")
 
     # Get elements
-    raw_pdf_elements = partition_pdf(
-        filename=file_path,
-        infer_table_structure=True,
-        extract_image_block_types=["image", "table"],
-        extract_image_block_to_payload=True,
-    )
+    partition_pdf = load_partition_pdf_func(config)
+    raw_pdf_elements = partition_pdf(filename=file_path)
 
     # Get images
     images = select_images(
