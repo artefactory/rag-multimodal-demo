@@ -4,7 +4,7 @@ from typing import Literal
 
 from omegaconf import OmegaConf
 from omegaconf.dictconfig import DictConfig
-from pydantic import BaseModel, ConfigDict, validator
+from pydantic import BaseModel, ConfigDict, root_validator, validator
 from pydantic.dataclasses import dataclass
 
 
@@ -47,6 +47,43 @@ class IngestConfig:
     table_min_size: list[float]
 
     export_extracted: bool
+
+    @root_validator(pre=True)
+    def validate_fields(cls, values: dict) -> dict:
+        """Various checks on the fields.
+
+        Args:
+            values (dict): Field values.
+
+        Returns:
+            dict: Validated field values.
+        """
+        partition_pdf_func = values["partition_pdf_func"]
+        table_format = values["table_format"]
+
+        # Check that the table structure is to be inferred when the table format is set
+        # to "html"
+        if table_format == "html" and (
+            "infer_table_structure" not in partition_pdf_func
+            or not partition_pdf_func["infer_table_structure"]
+        ):
+            raise ValueError(
+                "partition_pdf_func.infer_table_structure must be True when"
+                " table_format is 'html'"
+            )
+
+        # Check that tables are to be extracted as images when the table format is set
+        # to "image"
+        if table_format == "image" and (
+            "extract_image_block_types" not in partition_pdf_func
+            or "table" not in partition_pdf_func["extract_image_block_types"]
+        ):
+            raise ValueError(
+                "partition_pdf_func.extract_image_block_types must contain 'table'"
+                " when table_format is 'image'"
+            )
+
+        return values
 
     @validator("image_min_size", "table_min_size")
     def validate_size(cls, value: list[float]) -> list[float]:
