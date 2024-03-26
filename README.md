@@ -44,6 +44,8 @@ For all options, we can choose to treat tables as text or images.
 **Common parameters**:
 
 - `ingest.clear_database` : Whether to clear the database before ingesting new data.
+- `ingest.partition_pdf_func` : Parameters for Unstructured `partition_pdf` function.
+- `ingest.chunking_func` : Parameters for Unstructured chunking function.
 - `ingest.metadata_keys` : Unstructured metadata to use.
 - `ingest.table_format` : How to extract table with Unstructured (`text`, `html` or `image`).
 - `ingest.image_min_size` : Minimum relative size for images to be considered.
