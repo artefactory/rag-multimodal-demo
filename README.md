@@ -52,6 +52,8 @@ For all options, we can choose to treat tables as text or images.
 - `ingest.table_min_size` : Minimum relative size for tables to be considered.
 - `ingest.export_extracted` : Whether to export extracted elements in local folder.
 
+Padding around extracted images can be adjusted by specifying two environment variables `"EXTRACT_IMAGE_BLOCK_CROP_HORIZONTAL_PAD"` and `"EXTRACT_IMAGE_BLOCK_CROP_VERTICAL_PAD"`.
+
 ### RAG Option 1
 
 Folder: [backend/rag_1](backend/rag_1)
