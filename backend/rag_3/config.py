@@ -73,11 +73,34 @@ class IngestConfig:
         Returns:
             dict: Validated field values.
         """
+        partition_pdf_func = values["partition_pdf_func"]
         table_format = values["table_format"]
         summarize_text = values["summarize_text"]
         summarize_table = values["summarize_table"]
         vectorstore_source = values["vectorstore_source"]
         docstore_source = values["docstore_source"]
+
+        # Check that the table structure is to be inferred when the table format is set
+        # to "html"
+        if table_format == "html" and (
+            "infer_table_structure" not in partition_pdf_func
+            or not partition_pdf_func["infer_table_structure"]
+        ):
+            raise ValueError(
+                "partition_pdf_func.infer_table_structure must be True when"
+                " table_format is 'html'"
+            )
+
+        # Check that tables are to be extracted as images when the table format is set
+        # to "image"
+        if table_format == "image" and (
+            "extract_image_block_types" not in partition_pdf_func
+            or "table" not in partition_pdf_func["extract_image_block_types"]
+        ):
+            raise ValueError(
+                "partition_pdf_func.extract_image_block_types must contain 'table'"
+                " when table_format is 'image'"
+            )
 
         # Check that summary is enabled when the source is set to "summary"
         if vectorstore_source["text"] == "summary" and not summarize_text:
