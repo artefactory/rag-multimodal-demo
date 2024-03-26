@@ -129,6 +129,8 @@ def main(config: DictConfig) -> None:
     for file_path in tqdm(sorted(docs_folder.glob("**/*.pdf"))):
         ingest_pdf(file_path, config)
 
+    logger.info("Finished processing all PDF files")
+
 
 if __name__ == "__main__":
     main()
