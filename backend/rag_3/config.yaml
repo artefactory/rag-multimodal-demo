@@ -13,6 +13,7 @@ text_llm:
   deployment_name: "gpt4-turbo"
   temperature: 0.0
   max_tokens: 1024
+  timeout: 120
 
 vision_llm:
   _target_: langchain_openai.AzureChatOpenAI
@@ -22,6 +23,7 @@ vision_llm:
   deployment_name: "gpt4-vision"
   temperature: 0.0
   max_tokens: 1024
+  timeout: 120
 
 embedding:
   _target_: langchain_openai.AzureOpenAIEmbeddings

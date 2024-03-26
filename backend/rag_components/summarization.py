@@ -22,7 +22,9 @@ logger = logging.getLogger(__name__)
 
 
 @retry(
-    retry=retry_if_exception_type((openai.RateLimitError, openai.BadRequestError)),
+    retry=retry_if_exception_type(
+        (openai.RateLimitError, openai.BadRequestError, openai.APITimeoutError)
+    ),
     wait=wait_exponential(multiplier=60, max=180),
     stop=stop_after_delay(600),
     before=before_log(logger, logging.INFO),
