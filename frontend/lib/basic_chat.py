@@ -1,5 +1,7 @@
 import streamlit as st
 
+from .utils import format_string
+
 
 def basic_chat():
     user_question = st.chat_input("Say something")
@@ -13,4 +15,4 @@ def basic_chat():
             response = chain.stream(user_question)
 
             with st.chat_message("assistant"):
-                st.write(response)
+                st.write(format_string(response))
