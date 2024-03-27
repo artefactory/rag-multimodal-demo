@@ -44,10 +44,10 @@ For all options, we can choose to treat tables as text or images.
 **Common parameters**:
 
 - `ingest.clear_database` : Whether to clear the database before ingesting new data.
-- `ingest.partition_pdf_func` : Parameters for Unstructured `partition_pdf` function.
-- `ingest.chunking_func` : Parameters for Unstructured chunking function.
-- `ingest.metadata_keys` : Unstructured metadata to use.
-- `ingest.table_format` : How to extract table with Unstructured (`text`, `html` or `image`).
+- `ingest.partition_pdf_func` : Parameters for *Unstructured* `partition_pdf` function.
+- `ingest.chunking_func` : Parameters for *Unstructured* chunking function.
+- `ingest.metadata_keys` : *Unstructured* metadata to use.
+- `ingest.table_format` : How to extract table with *Unstructured* (`text`, `html` or `image`).
 - `ingest.image_min_size` : Minimum relative size for images to be considered.
 - `ingest.table_min_size` : Minimum relative size for tables to be considered.
 - `ingest.export_extracted` : Whether to export extracted elements in local folder.
@@ -131,6 +131,25 @@ To set up the project, ensure you have Python version between 3.10 and 3.11. The
 
 ```bash
 poetry install
+```
+
+*Unstructured* requires the following system dependencies:
+
+- *poppler-utils* : Needed for *pdf2image*.
+- *tesseract-ocr* : Needed for images and PDFs processing.
+
+Installation on Linux:
+
+```bash
+sudo apt update
+sudo apt install -y poppler-utils tesseract-ocr
+```
+
+Installation on MacOS:
+
+```bash
+brew update
+brew install poppler tesseract
 ```
 
 Before running the application, you need to set up the environment variables.
