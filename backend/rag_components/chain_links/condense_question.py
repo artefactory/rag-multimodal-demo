@@ -31,6 +31,8 @@ If the question is already self-sufficient, return the original question. If it 
 the user is authorizing the chatbot to answer without specific context, make sure to \
 reflect that in the rephrased question.
 
+Keep the same language in which the question was asked.
+
 Chat history: {chat_history}
 
 Question: {question}
