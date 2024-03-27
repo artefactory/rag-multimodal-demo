@@ -6,6 +6,8 @@ import streamlit as st
 
 from frontend.lib.backend_interface import query
 
+from .utils import format_string
+
 
 @dataclass
 class Message:
@@ -28,7 +30,7 @@ def session_chat():
     with st.container(border=True):
         for message in st.session_state.get("messages", []):
             with st.chat_message(message.sender):
-                st.write(message.content)
+                st.write(format_string(message.content))
 
         if user_question:
             if len(st.session_state.get("messages", [])) == 0:
@@ -54,7 +56,7 @@ def session_chat():
                 placeholder = st.empty()
                 for chunk in response:
                     full_response += chunk
-                    placeholder.write(full_response)
+                    placeholder.write(format_string(full_response))
 
             bot_message = Message("assistant", full_response, session_id)
             st.session_state["messages"].append(bot_message)
