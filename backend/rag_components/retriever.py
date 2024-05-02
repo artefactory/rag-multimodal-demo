@@ -72,6 +72,8 @@ def add_documents_multivector(
         raise ValueError(
             "The length of vectorstore_content and metadata_list must be the same"
         )
+    if len(vectorstore_content) == 0:
+        return
 
     if not isinstance(retriever, MultiVectorRetriever):
         raise ValueError("retriever must be a MultiVectorRetriever")

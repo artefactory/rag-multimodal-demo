@@ -62,6 +62,12 @@ def select_images(
         if width < min_size[0] or height < min_size[1]:
             continue
 
+        if (
+            element.metadata.image_mime_type is None
+            or element.metadata.image_base64 is None
+        ):
+            continue
+
         image = Image(
             base64=element.metadata.image_base64,
             mime_type=element.metadata.image_mime_type,
