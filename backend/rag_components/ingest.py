@@ -73,7 +73,10 @@ def add_elements_to_multivector_retriever(
 
 
 async def apply_summarize_text(
-    text_list: list[Text], config: DictConfig, prompt_template: str
+    text_list: list[Text],
+    config: DictConfig,
+    prompt_template: str,
+    chain_config: dict | None = None,
 ) -> None:
     """Apply text summarization to a list of Text elements.
 
@@ -83,6 +86,7 @@ async def apply_summarize_text(
         text_list (list[Text]): List of Text elements.
         config (DictConfig): Configuration object.
         prompt_template (str): Prompt template for the summarization.
+        chain_config (dict, optional): Configuration for the chain. Defaults to None.
     """
     if config.ingest.summarize_text:
         str_list = [text.text for text in text_list]
@@ -90,7 +94,10 @@ async def apply_summarize_text(
         model = get_text_llm(config)
 
         text_summaries = await generate_text_summaries(
-            str_list, prompt_template=prompt_template, model=model
+            str_list,
+            prompt_template=prompt_template,
+            model=model,
+            chain_config=chain_config,
         )
 
         for text in text_list:
@@ -103,7 +110,10 @@ async def apply_summarize_text(
 
 
 async def apply_summarize_table(
-    table_list: list[Table], config: DictConfig, prompt_template: str
+    table_list: list[Table],
+    config: DictConfig,
+    prompt_template: str,
+    chain_config: dict | None = None,
 ) -> None:
     """Apply table summarization to a list of Table elements.
 
@@ -113,6 +123,7 @@ async def apply_summarize_table(
         table_list (list[Table]): List of Table elements.
         config (DictConfig): Configuration object.
         prompt_template (str): Prompt template for the summarization.
+        chain_config (dict, optional): Configuration for the chain. Defaults to None.
 
     Raises:
         ValueError: If the table format is "image" and summarize_table is False.
@@ -129,6 +140,7 @@ async def apply_summarize_table(
                 str_list,
                 prompt_template=prompt_template,
                 model=model,
+                chain_config=chain_config,
             )
         elif config.ingest.table_format == "image":
             img_base64_list = [table.base64 for table in table_list]
@@ -140,6 +152,7 @@ async def apply_summarize_table(
                 img_mime_type_list,
                 prompt=prompt_template,
                 model=model,
+                chain_config=chain_config,
             )
         else:
             raise ValueError(f"Invalid table format: {table_format}")
@@ -154,7 +167,10 @@ async def apply_summarize_table(
 
 
 async def apply_summarize_image(
-    image_list: list[Image], config: DictConfig, prompt_template: str
+    image_list: list[Image],
+    config: DictConfig,
+    prompt_template: str,
+    chain_config: dict | None = None,
 ) -> None:
     """Apply image summarization to a list of Image elements.
 
@@ -164,6 +180,7 @@ async def apply_summarize_image(
         image_list (list[Image]): List of Image elements.
         config (DictConfig): Configuration object.
         prompt_template (str): Prompt template for the summarization.
+        chain_config (dict, optional): Configuration for the chain. Defaults to None.
     """
     img_base64_list = [image.base64 for image in image_list]
     img_mime_type_list = [image.mime_type for image in image_list]
@@ -175,6 +192,7 @@ async def apply_summarize_image(
         img_mime_type_list,
         prompt=prompt_template,
         model=model,
+        chain_config=chain_config,
     )
 
     for image in image_list:
