@@ -18,7 +18,7 @@ class User(BaseModel):
     hashed_password: str = None
 
     @classmethod
-    def from_unsecure_user(cls, unsecure_user: UnsecureUser):
+    def from_unsecure_user(cls, unsecure_user: UnsecureUser) -> "User":
         hashed_password = argon2.hash_password(unsecure_user.password).decode("utf-8")
         return cls(email=unsecure_user.email, hashed_password=hashed_password)
 

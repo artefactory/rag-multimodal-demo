@@ -23,7 +23,7 @@ def session_routes(
     *,
     authentication: Depends = None,
     dependencies: Sequence[Depends] | None = None,
-):
+) -> None:
     from backend.database import Database
 
     with Database() as connection:

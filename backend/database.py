@@ -117,7 +117,7 @@ class Database:
             self.logger.exception("Schema initialization failed", exc_info=e)
             raise
 
-    def run_script(self, path: Path):
+    def run_script(self, path: Path) -> None:
         try:
             self.logger.debug(f"Running Database script at {str(path)}")
             sql_script = path.read_text()
